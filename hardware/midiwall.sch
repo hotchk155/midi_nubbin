@@ -9059,29 +9059,29 @@ Source: www.kingbright.com</description>
 </sheet>
 </sheets>
 <errors>
-<approved hash="104,1,22.86,114.3,U$3,VDD,+5V,,,"/>
-<approved hash="104,1,63.5,114.3,U$3,VSS,GND,,,"/>
+<approved hash="104,1,22.86,114.3,IC1,VDD,+5V,,,"/>
+<approved hash="104,1,63.5,114.3,IC1,VSS,GND,,,"/>
 <approved hash="104,1,86.36,93.98,J1,VDD,+5V,,,"/>
 <approved hash="104,1,86.36,91.44,J1,VSS(GND),GND,,,"/>
-<approved hash="113,1,101.6,30.0905,S1,,,,,"/>
-<approved hash="113,1,101.6,17.3905,S2,,,,,"/>
-<approved hash="113,1,101.6,4.69053,S3,,,,,"/>
-<approved hash="113,1,101.6,-8.00947,S4,,,,,"/>
-<approved hash="113,1,101.6,-20.7095,S5,,,,,"/>
+<approved hash="113,1,101.6,30.0905,SW5,,,,,"/>
+<approved hash="113,1,101.6,17.3905,SW1,,,,,"/>
+<approved hash="113,1,101.6,4.69053,SW4,,,,,"/>
+<approved hash="113,1,101.6,-8.00947,SW2,,,,,"/>
+<approved hash="113,1,101.6,-20.7095,SW3,,,,,"/>
 <approved hash="113,1,95.0595,90.17,J1,,,,,"/>
-<approved hash="113,1,16.9113,87.63,C1,,,,,"/>
-<approved hash="113,1,24.5713,87.63,C2,,,,,"/>
+<approved hash="113,1,16.9113,87.63,C2,,,,,"/>
+<approved hash="113,1,24.5713,87.63,C1,,,,,"/>
 <approved hash="113,1,-0.994831,142.24,R1,,,,,"/>
 <approved hash="113,1,1.54517,142.24,R2,,,,,"/>
-<approved hash="113,1,29.4852,165.1,R3,,,,,"/>
+<approved hash="113,1,29.4852,165.1,R8,,,,,"/>
 <approved hash="113,1,1.54517,165.1,R4,,,,,"/>
-<approved hash="113,1,-0.994831,165.1,R5,,,,,"/>
-<approved hash="113,1,26.9452,165.1,R6,,,,,"/>
-<approved hash="113,1,26.9452,142.24,R7,,,,,"/>
-<approved hash="113,1,29.4852,142.24,R8,,,,,"/>
-<approved hash="113,1,6.62517,142.24,R9,,,,,"/>
+<approved hash="113,1,-0.994831,165.1,R3,,,,,"/>
+<approved hash="113,1,26.9452,165.1,R7,,,,,"/>
+<approved hash="113,1,26.9452,142.24,R9,,,,,"/>
+<approved hash="113,1,29.4852,142.24,R10,,,,,"/>
+<approved hash="113,1,6.62517,142.24,R5,,,,,"/>
 <approved hash="113,1,-12.3783,100.33,LED1,,,,,"/>
-<approved hash="113,1,-13.6948,88.9,R10,,,,,"/>
+<approved hash="113,1,-13.6948,88.9,R6,,,,,"/>
 </errors>
 </schematic>
 </drawing>
