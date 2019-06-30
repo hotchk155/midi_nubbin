@@ -139,14 +139,12 @@
 <package name="3_5MM_PTH_MICRO">
 <pad name="2" x="-3.2" y="0" drill="1.1" diameter="2"/>
 <pad name="2A" x="3.2" y="0" drill="1.1" diameter="2"/>
-<pad name="3" x="-3.2" y="-8" drill="1.1" diameter="2"/>
-<pad name="1" x="3.2" y="-8" drill="1.1" diameter="2"/>
+<pad name="3" x="3.15" y="-8" drill="1.1" diameter="2"/>
+<pad name="1" x="-3.15" y="-8" drill="1.1" diameter="2"/>
 <wire x1="-3.2" y1="-8.5" x2="3.2" y2="-8.5" width="0.127" layer="21"/>
 <wire x1="-3.2" y1="-8.5" x2="-3.2" y2="3.5" width="0.127" layer="21"/>
 <wire x1="3.2" y1="-8.5" x2="3.2" y2="3.5" width="0.127" layer="21"/>
-<wire x1="-3.2" y1="3.5" x2="-3" y2="3.5" width="0.127" layer="21"/>
-<wire x1="-3" y1="3.5" x2="3" y2="3.5" width="0.127" layer="21"/>
-<wire x1="3" y1="3.5" x2="3.2" y2="3.5" width="0.127" layer="21"/>
+<wire x1="-3.2" y1="3.5" x2="3.2" y2="3.5" width="0.127" layer="21"/>
 <hole x="0" y="1.5" drill="1.2"/>
 <hole x="0" y="-5.5" drill="1.2"/>
 <text x="-3.175" y="-3.175" size="1.27" layer="21">&gt;NAME</text>
