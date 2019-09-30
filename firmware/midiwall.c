@@ -17,16 +17,46 @@ typedef unsigned char byte;
 #define P_TRISA		0b11011110
 #define P_WPUA		0b00011100
 
+// port A bits for each keys scan line
 #define M_KEY0		0b00001000
 #define M_KEY1		0b00010000
 #define M_KEY2		0b00000100
 #define M_KEYS		0b00011100
 
+// M_KEYS bits which are pulled low for each of the 5 buttons
+#define K_KEY_A 	(M_KEY1)
+#define K_KEY_B 	(M_KEY0|M_KEY1)
+#define K_KEY_C 	(M_KEY1|M_KEY2)
+#define K_KEY_D 	(M_KEY2)
+#define K_KEY_E 	(M_KEY0)
+#define K_KEY_EC 	(M_KEY0|M_KEY1|M_KEY2)
+#define K_KEY_ED 	(M_KEY0|M_KEY2)
+
+#define MIDI_SYNCH_TICK     	0xf8
+#define MIDI_SYNCH_START    	0xfa
+#define MIDI_SYNCH_CONTINUE 	0xfb
+#define MIDI_SYNCH_STOP     	0xfc
+
+#define TICKS_PER_BEAT 24
+
 // Timer settings
-volatile byte timerTicked = 0;		// Timer ticked flag (tick once per ms)
+volatile byte timer_ticked = 0;		// Timer ticked flag (tick once per ms)
 #define TIMER_0_INIT_SCALAR		5	// Timer 0 is an 8 bit timer counting at 250kHz
 
-volatile int q = 0;
+volatile int tick_adjust = 0;
+
+#define TX_BUF_SIZE 10
+volatile byte tx_buf[TX_BUF_SIZE];
+volatile byte tx_buf_len = 0;
+volatile int master_ticks = 0;
+volatile byte master_clock_present = 0;
+void send(byte c)
+{	
+	if(tx_buf_len < TX_BUF_SIZE-2) {
+		tx_buf[tx_buf_len++] = c;
+	}
+}
+
 ////////////////////////////////////////////////////////////
 // INTERRUPT HANDLER 
 void interrupt( void )
@@ -38,8 +68,7 @@ void interrupt( void )
 	if(intcon.2)
 	{
 		tmr0 = TIMER_0_INIT_SCALAR;
-		timerTicked = 1;
-		if(q)--q;
+		timer_ticked = 1;
 		intcon.2 = 0;
 	}
 	
@@ -49,8 +78,18 @@ void interrupt( void )
 
 		// get the byte
 		byte b = rcreg;				
-		if(b == 0xF8) { 
-			txreg = 0xF8;
+		if(b == MIDI_SYNCH_TICK) { 
+			if(tick_adjust<0) {
+				++tick_adjust;
+			}
+			else {
+				send(MIDI_SYNCH_TICK);
+			}
+			master_clock_present = 1;
+			master_ticks = (master_ticks+1)%TICKS_PER_BEAT;
+		}
+		else if(b == MIDI_SYNCH_START) {
+			master_ticks = 0;
 		}
 		pir1.5 = 0;			
 	}
@@ -89,11 +128,11 @@ void init_usart()
 
 ////////////////////////////////////////////////////////////
 // SEND A BYTE ON SERIAL PORT
-void send(byte c)
-{
-	txreg = c;
-	while(!txsta.1);
-}
+//void send(byte c)
+//{
+//	txreg = c;
+//	while(!txsta.1);
+//}
 
 ////////////////////////////////////////////////////////////
 // ENTRY POINT
@@ -140,19 +179,53 @@ void main()
 
 	int debounce = 0;
 	// loop forever		
+	
+	int last_key = 0;
+	#define DEBOUNCE_MS 20
+	
+	int led_timeout = 0;
+	
 	for(;;)
 	{
 	
-		byte b = (~porta) & M_KEYS;
-		switch(b) {
-			case M_KEY0:					send(0xf8); break;
-			case M_KEY1:					send(0xf9); break;
-			case M_KEY2:					send(0xfa); break;
-			case M_KEY0|M_KEY1:				send(0xfb); break;
-			case M_KEY1|M_KEY2:				send(0xfc); break;
-			case M_KEY0|M_KEY2:				send(0xfd); break;
-			case M_KEY0|M_KEY1|M_KEY2:		send(0xfe); break;
-		}	
-		delay_ms(100);
+		if(timer_ticked) {
+			timer_ticked = 0;
+			
+			if(debounce) {
+				--debounce;
+			}
+			
+			if(led_timeout) {
+				if(!--led_timeout) {
+					P_LED = 0;
+				}
+			}		
+		}
+		
+		if(!debounce) 
+		{
+			byte this_key = (~porta) & M_KEYS;
+			if(this_key != last_key) {
+				debounce = DEBOUNCE_MS;						
+				last_key = this_key;
+				switch(this_key) {
+					case K_KEY_A:	--tick_adjust; break;
+					case K_KEY_B:	send(MIDI_SYNCH_TICK); break;
+					case K_KEY_C:	send(MIDI_SYNCH_START); break;
+					case K_KEY_D:	send(MIDI_SYNCH_STOP); break;
+					case K_KEY_E:	send(MIDI_SYNCH_CONTINUE); break;
+				}	
+			}
+		}
+
+		if(txsta.1 && tx_buf_len) {
+			txreg = tx_buf[--tx_buf_len];
+		}
+		
+		if(master_clock_present && !master_ticks) {
+			P_LED = 1;
+			led_timeout = 20;
+		}
+		
 	}
 }

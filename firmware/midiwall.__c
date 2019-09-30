@@ -3,7 +3,7 @@ Active Directory=D:\GitHub\midiwall\firmware\
 Target=PIC12F1822
 Active Compiler=BoostC
 Active Config=Release
-Config=1
+Config=0
 [Files]
 Count=1
 File0=midiwall.c

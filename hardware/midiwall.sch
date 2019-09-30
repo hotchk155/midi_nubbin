@@ -8633,7 +8633,7 @@ Source: www.kingbright.com</description>
 <part name="R9" library="rcl" deviceset="R-EU_" device="R0805"/>
 <part name="R10" library="rcl" deviceset="R-EU_" device="R0805"/>
 <part name="P+2" library="supply1" deviceset="+5V" device=""/>
-<part name="R5" library="rcl" deviceset="R-EU_" device="R0805"/>
+<part name="R5" library="rcl" deviceset="R-EU_" device="R0805" value="4k7"/>
 <part name="P+3" library="supply1" deviceset="+5V" device=""/>
 <part name="P+4" library="supply1" deviceset="+5V" device=""/>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
@@ -8644,6 +8644,8 @@ Source: www.kingbright.com</description>
 <sheets>
 <sheet>
 <plain>
+<text x="5.08" y="185.42" size="1.778" layer="97">R4/R1, R7/R10 - MMA
+R3/R2, R8/R9 - NOVATION/ARTURIA</text>
 </plain>
 <instances>
 <instance part="IN" gate="G$1" x="-12.7" y="154.94"/>
@@ -8667,18 +8669,45 @@ Source: www.kingbright.com</description>
 <instance part="C1" gate="G$1" x="22.86" y="86.36"/>
 <instance part="GND2" gate="1" x="15.24" y="78.74"/>
 <instance part="GND3" gate="1" x="22.86" y="78.74"/>
-<instance part="R1" gate="G$1" x="0" y="142.24" rot="R90"/>
-<instance part="R2" gate="G$1" x="2.54" y="142.24" rot="R90"/>
+<instance part="R1" gate="G$1" x="0" y="142.24" smashed="yes" rot="R90">
+<attribute name="NAME" x="-1.4986" y="138.43" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="3.302" y="138.43" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="R2" gate="G$1" x="2.54" y="142.24" smashed="yes" rot="R90">
+<attribute name="NAME" x="6.1214" y="138.43" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="5.842" y="138.43" size="1.778" layer="96" rot="R90"/>
+</instance>
 <instance part="GND4" gate="1" x="15.24" y="134.62"/>
-<instance part="R8" gate="G$1" x="30.48" y="165.1" rot="R90"/>
+<instance part="R8" gate="G$1" x="30.48" y="165.1" smashed="yes" rot="R90">
+<attribute name="NAME" x="34.0614" y="161.29" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="33.782" y="161.29" size="1.778" layer="96" rot="R90"/>
+</instance>
 <instance part="P+1" gate="1" x="30.48" y="180.34"/>
-<instance part="R4" gate="G$1" x="2.54" y="165.1" rot="R90"/>
-<instance part="R3" gate="G$1" x="0" y="165.1" rot="R90"/>
-<instance part="R7" gate="G$1" x="27.94" y="165.1" rot="R90"/>
-<instance part="R9" gate="G$1" x="27.94" y="142.24" rot="R90"/>
-<instance part="R10" gate="G$1" x="30.48" y="142.24" rot="R90"/>
+<instance part="R4" gate="G$1" x="2.54" y="165.1" smashed="yes" rot="R90">
+<attribute name="NAME" x="6.1214" y="163.83" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="5.842" y="161.29" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="R3" gate="G$1" x="0" y="165.1" smashed="yes" rot="R90">
+<attribute name="NAME" x="-1.4986" y="161.29" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="3.302" y="161.29" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="R7" gate="G$1" x="27.94" y="165.1" smashed="yes" rot="R90">
+<attribute name="NAME" x="26.4414" y="161.29" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="31.242" y="161.29" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="R9" gate="G$1" x="27.94" y="142.24" smashed="yes" rot="R90">
+<attribute name="NAME" x="26.4414" y="138.43" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="31.242" y="138.43" size="1.778" layer="96" rot="R90"/>
+</instance>
+<instance part="R10" gate="G$1" x="30.48" y="142.24" smashed="yes" rot="R90">
+<attribute name="NAME" x="34.0614" y="138.43" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="33.782" y="138.43" size="1.778" layer="96" rot="R90"/>
+</instance>
 <instance part="P+2" gate="1" x="0" y="180.34"/>
-<instance part="R5" gate="G$1" x="7.62" y="142.24" rot="R90"/>
+<instance part="R5" gate="G$1" x="7.62" y="142.24" smashed="yes" rot="R90">
+<attribute name="NAME" x="11.2014" y="143.51" size="1.778" layer="95" rot="R90"/>
+<attribute name="VALUE" x="10.922" y="138.43" size="1.778" layer="96" rot="R90"/>
+</instance>
 <instance part="P+3" gate="1" x="7.62" y="152.4"/>
 <instance part="P+4" gate="1" x="15.24" y="124.46"/>
 <instance part="GND5" gate="1" x="66.04" y="78.74"/>
@@ -9083,4 +9112,10 @@ Source: www.kingbright.com</description>
 </errors>
 </schematic>
 </drawing>
+<compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
+</compatibility>
 </eagle>
