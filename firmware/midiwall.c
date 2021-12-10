@@ -44,16 +44,39 @@ volatile byte timer_ticked = 0;		// Timer ticked flag (tick once per ms)
 #define TIMER_0_INIT_SCALAR		5	// Timer 0 is an 8 bit timer counting at 250kHz
 
 volatile int tick_adjust = 0;
+volatile int is_running = 0;
 
-#define TX_BUF_SIZE 10
-volatile byte tx_buf[TX_BUF_SIZE];
-volatile byte tx_buf_len = 0;
+#define SZ_RXBUFFER 64
+#define RXBUFFER_INDEX_MASK 0x3F
+
+#define SZ_TXBUFFER 64
+#define TXBUFFER_INDEX_MASK 0x3F
+
+volatile byte rx_buf[SZ_RXBUFFER];
+volatile byte rx_head = 0;
+volatile byte rx_tail = 0;
+
+volatile byte tx_buf[SZ_TXBUFFER];
+volatile byte tx_head = 0;
+volatile byte tx_tail = 0;
+
+
 volatile int master_ticks = 0;
 volatile byte master_clock_present = 0;
-void send(byte c)
-{	
-	if(tx_buf_len < TX_BUF_SIZE-2) {
-		tx_buf[tx_buf_len++] = c;
+
+////////////////////////////////////////////////////////////
+void send(byte d) {
+
+	if(tx_head == tx_tail) {
+		txreg = d;
+	}
+	else {
+		byte next_head = tx_head + 1;
+		next_head &= TXBUFFER_INDEX_MASK;	
+		if(next_head != tx_tail) {
+			tx_buffer[tx_head] = d;
+			tx_head = next_head;		
+		}				
 	}
 }
 
@@ -78,8 +101,12 @@ void interrupt( void )
 
 		// get the byte
 		byte b = rcreg;				
-		if(b == MIDI_SYNCH_TICK) { 
-			if(tick_adjust<0) {
+		switch(b) {
+		case MIDI_SYNCH_TICK:
+			if(!is_running) {
+				// do nothing - ignore it
+			}
+			else if(tick_adjust<0) {
 				++tick_adjust;
 			}
 			else {
@@ -87,12 +114,43 @@ void interrupt( void )
 			}
 			master_clock_present = 1;
 			master_ticks = (master_ticks+1)%TICKS_PER_BEAT;
-		}
-		else if(b == MIDI_SYNCH_START) {
+			break;
+		case MIDI_SYNCH_START:
+			is_running = 1;
 			master_ticks = 0;
+			break;
+		case MIDI_SYNCH_STOP:
+			is_running = 0;
+			break;
+		case MIDI_SYNCH_CONTINUE:
+			is_running = 1;
+			break;
+		default:
+			send(b);
+			break;
 		}
 		pir1.5 = 0;			
 	}
+	
+	////////////////////////////////////////////////
+	// SERIAL PORT TRANSMIT INTERRUPT
+	// TXIF bit is high whenever there is no serial
+	// transmit in progress. Low->High transition will
+	// trigger an interrupt, meaning characters of the 
+	// transmit buffer can be sent back to back
+	if(pir1.4) 
+	{	
+		// any pending data in transmit buffer
+		if(tx_head != tx_tail) {		
+			// send next character
+			txreg = tx_buffer[tx_tail];
+			++tx_tail;
+			tx_tail &= TXBUFFER_INDEX_MASK;
+		}
+		pir1.4 = 0;
+	}
+	
+	
 }
 
 ////////////////////////////////////////////////////////////
@@ -184,7 +242,12 @@ void main()
 	#define DEBOUNCE_MS 20
 	
 	int led_timeout = 0;
-	
+
+/*
+TODO - ensure that keys for a command are released before 
+allowing a further command; stop sometimes registered with
+quick presses of start
+*/	
 	for(;;)
 	{
 	
@@ -211,9 +274,9 @@ void main()
 				switch(this_key) {
 					case K_KEY_A:	--tick_adjust; break;
 					case K_KEY_B:	send(MIDI_SYNCH_TICK); break;
-					case K_KEY_C:	send(MIDI_SYNCH_START); break;
-					case K_KEY_D:	send(MIDI_SYNCH_STOP); break;
-					case K_KEY_E:	send(MIDI_SYNCH_CONTINUE); break;
+					case K_KEY_C:	send(MIDI_SYNCH_START); is_running=1; break;
+					case K_KEY_D:	send(MIDI_SYNCH_STOP); is_running=0; break;
+					case K_KEY_E:	send(MIDI_SYNCH_CONTINUE); is_running=1; break;
 				}	
 			}
 		}
@@ -224,7 +287,7 @@ void main()
 		
 		if(master_clock_present && !master_ticks) {
 			P_LED = 1;
-			led_timeout = 20;
+			led_timeout = is_running? 50:1;
 		}
 		
 	}

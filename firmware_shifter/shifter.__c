@@ -1,0 +1,12 @@
+[Settings]
+Active Directory=D:\GitHub\midiwall\firmware_shifter\
+Target=PIC12F1822
+Active Compiler=BoostC
+Active Config=Release
+Config=0
+Last Ext=h
+[Files]
+Count=3
+File0=mw_common.c
+File1=mw_common.h
+File2=shifter.c
