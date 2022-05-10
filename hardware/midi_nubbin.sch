@@ -14750,12 +14750,12 @@ Source: http://www.osram.convergy.de/</description>
 <approved hash="104,1,129.54,116.84,ICSP,VDD,+5V,,,"/>
 <approved hash="104,1,129.54,114.3,ICSP,VSS(GND),GND,,,"/>
 <approved hash="113,1,138.239,113.03,ICSP,,,,,"/>
-<approved hash="113,1,115.971,80.01,C2,,,,,"/>
+<approved hash="113,1,116.016,80.01,C2,,,,,"/>
 <approved hash="113,1,-88.5783,67.31,D1,,,,,"/>
 <approved hash="113,1,-89.8948,86.36,R1,,,,,"/>
 <approved hash="113,1,-73.3383,67.31,D2,,,,,"/>
 <approved hash="113,1,-74.6548,86.36,R4,,,,,"/>
-<approved hash="113,1,123.278,80.01,C1,,,,,"/>
+<approved hash="113,1,123.323,80.01,C1,,,,,"/>
 <approved hash="113,1,47.2652,172.72,R3,,,,,"/>
 </errors>
 </schematic>
