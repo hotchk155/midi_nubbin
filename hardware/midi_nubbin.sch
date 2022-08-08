@@ -205,6 +205,56 @@
 <wire x1="-1.5" y1="-2.8" x2="1.5" y2="-2.8" width="0.127" layer="21"/>
 <wire x1="-1.5" y1="2.8" x2="1.5" y2="2.8" width="0.127" layer="21"/>
 </package>
+<package name="SSOP20">
+<description>&lt;b&gt;Shrink Small Outline Package&lt;/b&gt;&lt;p&gt;
+package type SS</description>
+<wire x1="-3.8" y1="-2.6" x2="3.8" y2="-2.6" width="0.2032" layer="21"/>
+<wire x1="3.8" y1="-2.6" x2="3.8" y2="2.6" width="0.2032" layer="21"/>
+<wire x1="3.8" y1="2.6" x2="-3.8" y2="2.6" width="0.2032" layer="21"/>
+<smd name="1" x="-2.925" y="-3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="2" x="-2.275" y="-3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="3" x="-1.625" y="-3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="4" x="-0.975" y="-3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="5" x="-0.325" y="-3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="6" x="0.325" y="-3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="7" x="0.975" y="-3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="8" x="1.625" y="-3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="9" x="2.275" y="-3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="10" x="2.925" y="-3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="11" x="2.925" y="3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="12" x="2.275" y="3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="13" x="1.625" y="3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="14" x="0.975" y="3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="15" x="0.325" y="3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="16" x="-0.325" y="3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="17" x="-0.975" y="3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="18" x="-1.625" y="3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="19" x="-2.275" y="3.625" dx="0.4" dy="1.5" layer="1"/>
+<smd name="20" x="-2.925" y="3.625" dx="0.4" dy="1.5" layer="1"/>
+<text x="-4.206" y="-2.5999" size="1.27" layer="25" rot="R90">&gt;NAME</text>
+<text x="5.506" y="-2.5999" size="1.27" layer="27" rot="R90">&gt;VALUE</text>
+<rectangle x1="-3.1028" y1="-3.937" x2="-2.7472" y2="-2.6416" layer="51"/>
+<rectangle x1="-2.4529" y1="-3.937" x2="-2.0973" y2="-2.6416" layer="51"/>
+<rectangle x1="-1.8029" y1="-3.937" x2="-1.4473" y2="-2.6416" layer="51"/>
+<rectangle x1="-1.1529" y1="-3.937" x2="-0.7973" y2="-2.6416" layer="51"/>
+<rectangle x1="-0.5029" y1="-3.937" x2="-0.1473" y2="-2.6416" layer="51"/>
+<rectangle x1="0.1471" y1="-3.937" x2="0.5027" y2="-2.6416" layer="51"/>
+<rectangle x1="0.7971" y1="-3.937" x2="1.1527" y2="-2.6416" layer="51"/>
+<rectangle x1="1.4473" y1="-3.937" x2="1.8029" y2="-2.6416" layer="51"/>
+<rectangle x1="2.0973" y1="-3.937" x2="2.4529" y2="-2.6416" layer="51"/>
+<rectangle x1="2.7473" y1="-3.937" x2="3.1029" y2="-2.6416" layer="51"/>
+<rectangle x1="2.7471" y1="2.6416" x2="3.1027" y2="3.937" layer="51"/>
+<rectangle x1="2.0971" y1="2.6416" x2="2.4527" y2="3.937" layer="51"/>
+<rectangle x1="1.4471" y1="2.6416" x2="1.8027" y2="3.937" layer="51"/>
+<rectangle x1="0.7972" y1="2.6416" x2="1.1528" y2="3.937" layer="51"/>
+<rectangle x1="0.1472" y1="2.6416" x2="0.5028" y2="3.937" layer="51"/>
+<rectangle x1="-0.5027" y1="2.6416" x2="-0.1471" y2="3.937" layer="51"/>
+<rectangle x1="-1.1527" y1="2.6416" x2="-0.7971" y2="3.937" layer="51"/>
+<rectangle x1="-1.8027" y1="2.6416" x2="-1.4471" y2="3.937" layer="51"/>
+<rectangle x1="-2.4527" y1="2.6416" x2="-2.0971" y2="3.937" layer="51"/>
+<rectangle x1="-3.1027" y1="2.6416" x2="-2.7471" y2="3.937" layer="51"/>
+<rectangle x1="-3.8999" y1="-2.5999" x2="-2.925" y2="2.5999" layer="27"/>
+</package>
 </packages>
 <symbols>
 <symbol name="PIC16F1543">
@@ -261,6 +311,33 @@
 </gates>
 <devices>
 <device name="" package="TSSOP20">
+<connects>
+<connect gate="G$1" pin="RA0/PCD" pad="19"/>
+<connect gate="G$1" pin="RA1/PGC" pad="18"/>
+<connect gate="G$1" pin="RA2" pad="17"/>
+<connect gate="G$1" pin="RA3/MCLR#" pad="4"/>
+<connect gate="G$1" pin="RA4" pad="3"/>
+<connect gate="G$1" pin="RA5" pad="2"/>
+<connect gate="G$1" pin="RB4" pad="13"/>
+<connect gate="G$1" pin="RB5" pad="12"/>
+<connect gate="G$1" pin="RB6" pad="11"/>
+<connect gate="G$1" pin="RB7" pad="10"/>
+<connect gate="G$1" pin="RC0" pad="16"/>
+<connect gate="G$1" pin="RC1" pad="15"/>
+<connect gate="G$1" pin="RC2" pad="14"/>
+<connect gate="G$1" pin="RC3" pad="7"/>
+<connect gate="G$1" pin="RC4" pad="6"/>
+<connect gate="G$1" pin="RC5" pad="5"/>
+<connect gate="G$1" pin="RC6" pad="8"/>
+<connect gate="G$1" pin="RC7" pad="9"/>
+<connect gate="G$1" pin="VDD" pad="1"/>
+<connect gate="G$1" pin="VSS" pad="20"/>
+</connects>
+<technologies>
+<technology name=""/>
+</technologies>
+</device>
+<device name="SSOP20" package="SSOP20">
 <connects>
 <connect gate="G$1" pin="RA0/PCD" pad="19"/>
 <connect gate="G$1" pin="RA1/PGC" pad="18"/>
@@ -14372,7 +14449,7 @@ Source: http://www.osram.convergy.de/</description>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
 <part name="OUT" library="con-lumberg" deviceset="1503_02" device=""/>
 <part name="IN" library="con-lumberg" deviceset="1503_02" device=""/>
-<part name="IC1" library="jason_eagle6" deviceset="PIC16F15345" device=""/>
+<part name="IC1" library="jason_eagle6" deviceset="PIC16F15345" device="SSOP20" value="PIC16F15345SSOP20"/>
 <part name="SW5" library="jason_eagle6" deviceset="6MMTACTSMT" device=""/>
 <part name="SW45" library="jason_eagle6" deviceset="6MMTACTSMT" device=""/>
 <part name="SW3" library="jason_eagle6" deviceset="6MMTACTSMT" device=""/>
@@ -14396,6 +14473,9 @@ Source: http://www.osram.convergy.de/</description>
 <text x="-17.526" y="163.576" size="1.778" layer="97">Tip (Signal)</text>
 <text x="-17.526" y="157.734" size="1.778" layer="97">Ring (+5V)</text>
 <text x="-17.526" y="152.654" size="1.778" layer="97">Sleeve (GND)</text>
+<text x="-78.74" y="198.12" size="7.62" layer="91">***********TODO
+INCORRECT FOOTPRINT TO MCU
+220R ON MIDI SIGNAL?</text>
 </plain>
 <instances>
 <instance part="GND1" gate="1" x="17.78" y="55.88"/>
@@ -14760,4 +14840,10 @@ Source: http://www.osram.convergy.de/</description>
 </errors>
 </schematic>
 </drawing>
+<compatibility>
+<note version="6.3" minversion="6.2.2" severity="warning">
+Since Version 6.2.2 text objects can contain more than one line,
+which will not be processed correctly with this version.
+</note>
+</compatibility>
 </eagle>
