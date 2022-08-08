@@ -14436,14 +14436,14 @@ Source: http://www.osram.convergy.de/</description>
 <part name="GND4" library="supply1" deviceset="GND" device=""/>
 <part name="P+1" library="supply1" deviceset="+5V" device=""/>
 <part name="P+2" library="supply1" deviceset="+5V" device=""/>
-<part name="R2" library="rcl" deviceset="R-EU_" device="R0805" value="4k7"/>
+<part name="R3" library="rcl" deviceset="R-EU_" device="R0805" value="4k7"/>
 <part name="P+3" library="supply1" deviceset="+5V" device=""/>
 <part name="P+4" library="supply1" deviceset="+5V" device=""/>
 <part name="D1" library="adafruit" deviceset="LED" device="CHIPLED_0805"/>
 <part name="R1" library="rcl" deviceset="R-EU_" device="R0805"/>
 <part name="GND6" library="supply1" deviceset="GND" device=""/>
 <part name="D2" library="adafruit" deviceset="LED" device="CHIPLED_0805"/>
-<part name="R4" library="rcl" deviceset="R-EU_" device="R0805"/>
+<part name="R6" library="rcl" deviceset="R-EU_" device="R0805"/>
 <part name="GND5" library="supply1" deviceset="GND" device=""/>
 <part name="C1" library="resistor" deviceset="CPOL-EU" device="SMCB"/>
 <part name="GND7" library="supply1" deviceset="GND" device=""/>
@@ -14455,22 +14455,24 @@ Source: http://www.osram.convergy.de/</description>
 <part name="SW3" library="jason_eagle6" deviceset="6MMTACTSMT" device=""/>
 <part name="SW1" library="jason_eagle6" deviceset="6MMTACTSMT" device=""/>
 <part name="SW2" library="jason_eagle6" deviceset="6MMTACTSMT" device=""/>
-<part name="R3" library="rcl" deviceset="R-EU_" device="R0805"/>
+<part name="R4" library="rcl" deviceset="R-EU_" device="R0805"/>
+<part name="R5" library="rcl" deviceset="R-EU_" device="R0805" value="220"/>
+<part name="R2" library="rcl" deviceset="R-EU_" device="R0805" value="220"/>
 </parts>
 <sheets>
 <sheet>
 <plain>
-<text x="-22.86" y="38.1" size="5.08" layer="97">MIDI NUBBIN rev 1</text>
-<text x="-22.86" y="30.48" size="5.08" layer="97">Apr 2022 - Sixty four pixels ltd</text>
+<text x="-22.86" y="38.1" size="5.08" layer="97">MIDI NUBBIN rev 2</text>
+<text x="-22.86" y="30.48" size="5.08" layer="97">Aug 2022 - Sixty four pixels ltd</text>
 <text x="-22.86" y="22.86" size="5.08" layer="97">CC-NC-BY-SA</text>
 <wire x1="-25.4" y1="45.72" x2="-25.4" y2="20.32" width="0.1524" layer="97"/>
 <wire x1="-25.4" y1="20.32" x2="88.9" y2="20.32" width="0.1524" layer="97"/>
 <wire x1="88.9" y1="20.32" x2="88.9" y2="45.72" width="0.1524" layer="97"/>
 <wire x1="88.9" y1="45.72" x2="-25.4" y2="45.72" width="0.1524" layer="97"/>
-<text x="33.274" y="163.576" size="1.778" layer="97">Tip (Signal)</text>
+<text x="19.05" y="163.83" size="1.778" layer="97">Tip (Signal)</text>
 <text x="33.274" y="157.734" size="1.778" layer="97">Ring (+5V)</text>
 <text x="33.274" y="152.654" size="1.778" layer="97">Sleeve (GND)</text>
-<text x="-17.526" y="163.576" size="1.778" layer="97">Tip (Signal)</text>
+<text x="-5.842" y="163.576" size="1.778" layer="97">Tip (Signal)</text>
 <text x="-17.526" y="157.734" size="1.778" layer="97">Ring (+5V)</text>
 <text x="-17.526" y="152.654" size="1.778" layer="97">Sleeve (GND)</text>
 <text x="-78.74" y="198.12" size="7.62" layer="91">***********TODO
@@ -14486,7 +14488,7 @@ INCORRECT FOOTPRINT TO MCU
 <instance part="GND4" gate="1" x="15.24" y="134.62"/>
 <instance part="P+1" gate="1" x="48.26" y="182.88"/>
 <instance part="P+2" gate="1" x="-20.32" y="172.72"/>
-<instance part="R2" gate="G$1" x="7.62" y="147.32" smashed="yes" rot="R90">
+<instance part="R3" gate="G$1" x="7.62" y="147.32" smashed="yes" rot="R90">
 <attribute name="NAME" x="11.2014" y="148.59" size="1.778" layer="95" rot="R90"/>
 <attribute name="VALUE" x="10.922" y="143.51" size="1.778" layer="96" rot="R90"/>
 </instance>
@@ -14496,7 +14498,7 @@ INCORRECT FOOTPRINT TO MCU
 <instance part="R1" gate="G$1" x="-88.9" y="86.36" rot="R90"/>
 <instance part="GND6" gate="1" x="-88.9" y="58.42"/>
 <instance part="D2" gate="G$1" x="-73.66" y="68.58"/>
-<instance part="R4" gate="G$1" x="-73.66" y="86.36" rot="R90"/>
+<instance part="R6" gate="G$1" x="-73.66" y="86.36" rot="R90"/>
 <instance part="GND5" gate="1" x="-73.66" y="58.42"/>
 <instance part="C1" gate="G$1" x="121.92" y="81.28"/>
 <instance part="GND7" gate="1" x="106.68" y="71.12"/>
@@ -14508,7 +14510,15 @@ INCORRECT FOOTPRINT TO MCU
 <instance part="SW3" gate="G$1" x="7.62" y="86.36"/>
 <instance part="SW1" gate="G$1" x="7.62" y="73.66"/>
 <instance part="SW2" gate="G$1" x="7.62" y="60.96"/>
-<instance part="R3" gate="G$1" x="48.26" y="172.72" rot="R90"/>
+<instance part="R4" gate="G$1" x="48.26" y="172.72" rot="R90"/>
+<instance part="R5" gate="G$1" x="38.1" y="162.56" smashed="yes" rot="R180">
+<attribute name="NAME" x="35.814" y="165.8874" size="1.778" layer="95" rot="R180"/>
+<attribute name="VALUE" x="41.91" y="166.116" size="1.778" layer="96" rot="R180"/>
+</instance>
+<instance part="R2" gate="G$1" x="-10.16" y="162.56" smashed="yes" rot="R180">
+<attribute name="NAME" x="-12.446" y="165.8874" size="1.778" layer="95" rot="R180"/>
+<attribute name="VALUE" x="-6.35" y="166.116" size="1.778" layer="96" rot="R180"/>
+</instance>
 </instances>
 <busses>
 </busses>
@@ -14518,8 +14528,8 @@ INCORRECT FOOTPRINT TO MCU
 <wire x1="25.4" y1="139.7" x2="30.48" y2="139.7" width="0.1524" layer="91"/>
 <label x="30.48" y="139.7" size="1.778" layer="95"/>
 <wire x1="25.4" y1="162.56" x2="25.4" y2="139.7" width="0.1524" layer="91"/>
-<pinref part="OUT" gate="G$1" pin="2"/>
-<wire x1="55.88" y1="162.56" x2="25.4" y2="162.56" width="0.1524" layer="91"/>
+<pinref part="R5" gate="G$1" pin="2"/>
+<wire x1="33.02" y1="162.56" x2="25.4" y2="162.56" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <wire x1="63.5" y1="101.6" x2="43.18" y2="101.6" width="0.1524" layer="91"/>
@@ -14529,15 +14539,15 @@ INCORRECT FOOTPRINT TO MCU
 </net>
 <net name="RX" class="0">
 <segment>
-<pinref part="R2" gate="G$1" pin="1"/>
+<pinref part="R3" gate="G$1" pin="1"/>
 <wire x1="7.62" y1="142.24" x2="7.62" y2="139.7" width="0.1524" layer="91"/>
 <wire x1="7.62" y1="139.7" x2="2.54" y2="139.7" width="0.1524" layer="91"/>
 <label x="-10.16" y="139.7" size="1.778" layer="95"/>
 <wire x1="2.54" y1="139.7" x2="-5.08" y2="139.7" width="0.1524" layer="91"/>
 <wire x1="2.54" y1="162.56" x2="2.54" y2="139.7" width="0.1524" layer="91"/>
 <junction x="2.54" y="139.7"/>
-<pinref part="IN" gate="G$1" pin="2"/>
-<wire x1="-25.4" y1="162.56" x2="2.54" y2="162.56" width="0.1524" layer="91"/>
+<pinref part="R2" gate="G$1" pin="1"/>
+<wire x1="-5.08" y1="162.56" x2="2.54" y2="162.56" width="0.1524" layer="91"/>
 </segment>
 <segment>
 <wire x1="63.5" y1="104.14" x2="43.18" y2="104.14" width="0.1524" layer="91"/>
@@ -14629,7 +14639,7 @@ INCORRECT FOOTPRINT TO MCU
 </net>
 <net name="+5V" class="0">
 <segment>
-<pinref part="R2" gate="G$1" pin="2"/>
+<pinref part="R3" gate="G$1" pin="2"/>
 <pinref part="P+3" gate="1" pin="+5V"/>
 <wire x1="7.62" y1="152.4" x2="7.62" y2="170.18" width="0.1524" layer="91"/>
 </segment>
@@ -14660,7 +14670,7 @@ INCORRECT FOOTPRINT TO MCU
 <wire x1="-25.4" y1="157.48" x2="-20.32" y2="157.48" width="0.1524" layer="91"/>
 </segment>
 <segment>
-<pinref part="R3" gate="G$1" pin="2"/>
+<pinref part="R4" gate="G$1" pin="2"/>
 <pinref part="P+1" gate="1" pin="+5V"/>
 <wire x1="48.26" y1="177.8" x2="48.26" y2="180.34" width="0.1524" layer="91"/>
 </segment>
@@ -14768,7 +14778,7 @@ INCORRECT FOOTPRINT TO MCU
 <wire x1="-73.66" y1="106.68" x2="-53.34" y2="106.68" width="0.1524" layer="91"/>
 <label x="-53.34" y="106.68" size="1.778" layer="95"/>
 <wire x1="-73.66" y1="91.44" x2="-73.66" y2="106.68" width="0.1524" layer="91"/>
-<pinref part="R4" gate="G$1" pin="2"/>
+<pinref part="R6" gate="G$1" pin="2"/>
 </segment>
 <segment>
 <label x="116.84" y="101.6" size="1.778" layer="95"/>
@@ -14810,7 +14820,7 @@ INCORRECT FOOTPRINT TO MCU
 </net>
 <net name="N$2" class="0">
 <segment>
-<pinref part="R4" gate="G$1" pin="1"/>
+<pinref part="R6" gate="G$1" pin="1"/>
 <pinref part="D2" gate="G$1" pin="A"/>
 <wire x1="-73.66" y1="81.28" x2="-73.66" y2="71.12" width="0.1524" layer="91"/>
 </segment>
@@ -14819,8 +14829,22 @@ INCORRECT FOOTPRINT TO MCU
 <segment>
 <pinref part="OUT" gate="G$1" pin="3"/>
 <wire x1="48.26" y1="157.48" x2="55.88" y2="157.48" width="0.1524" layer="91"/>
-<pinref part="R3" gate="G$1" pin="1"/>
+<pinref part="R4" gate="G$1" pin="1"/>
 <wire x1="48.26" y1="157.48" x2="48.26" y2="167.64" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$4" class="0">
+<segment>
+<pinref part="R5" gate="G$1" pin="1"/>
+<pinref part="OUT" gate="G$1" pin="2"/>
+<wire x1="43.18" y1="162.56" x2="55.88" y2="162.56" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$5" class="0">
+<segment>
+<pinref part="IN" gate="G$1" pin="2"/>
+<pinref part="R2" gate="G$1" pin="2"/>
+<wire x1="-25.4" y1="162.56" x2="-15.24" y2="162.56" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
@@ -14834,9 +14858,9 @@ INCORRECT FOOTPRINT TO MCU
 <approved hash="113,1,-88.5783,67.31,D1,,,,,"/>
 <approved hash="113,1,-89.8948,86.36,R1,,,,,"/>
 <approved hash="113,1,-73.3383,67.31,D2,,,,,"/>
-<approved hash="113,1,-74.6548,86.36,R4,,,,,"/>
+<approved hash="113,1,-74.6548,86.36,R6,,,,,"/>
 <approved hash="113,1,123.323,80.01,C1,,,,,"/>
-<approved hash="113,1,47.2652,172.72,R3,,,,,"/>
+<approved hash="113,1,47.2652,172.72,R4,,,,,"/>
 </errors>
 </schematic>
 </drawing>
