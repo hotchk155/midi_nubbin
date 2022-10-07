@@ -14475,9 +14475,6 @@ Source: http://www.osram.convergy.de/</description>
 <text x="-5.842" y="163.576" size="1.778" layer="97">Tip (Signal)</text>
 <text x="-17.526" y="157.734" size="1.778" layer="97">Ring (+5V)</text>
 <text x="-17.526" y="152.654" size="1.778" layer="97">Sleeve (GND)</text>
-<text x="-78.74" y="198.12" size="7.62" layer="91">***********TODO
-INCORRECT FOOTPRINT TO MCU
-220R ON MIDI SIGNAL?</text>
 </plain>
 <instances>
 <instance part="GND1" gate="1" x="17.78" y="55.88"/>
@@ -14864,10 +14861,4 @@ INCORRECT FOOTPRINT TO MCU
 </errors>
 </schematic>
 </drawing>
-<compatibility>
-<note version="6.3" minversion="6.2.2" severity="warning">
-Since Version 6.2.2 text objects can contain more than one line,
-which will not be processed correctly with this version.
-</note>
-</compatibility>
 </eagle>

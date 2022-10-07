@@ -22,23 +22,6 @@
 *.s#8
 *.s#9
 
-# GERBER
-
-*.GBL
-*.GBO
-*.GBS
-*.gpi
-*.dri
-*.GTL
-*.GTO
-*.GTP
-*.GTS
-*.GM1
-*.GBP
-*.TXT
-
-*.ZIP
-
 
 
 ############
@@ -51,31 +34,5 @@ Thumbs.db
 # Folder config file
 Desktop.ini
 
-
-##############
-## Sourceboost
-##############
-*.asm
-*.brws
-*.casm
-*.cof
-*.lst
-*.map
-*.obj
-*.stat
-*.tree
-makefile.*
-*.exe
-*.pp
-cv-strip.hex
-
-
-*.dxf
-*.odt#
-
-old/*.*
-Backup_of_*.cdr
-
-cvocfg/node_modules
-hardware/midiwall.b##
-hardware/midiwall.s##
+firmware/build
+firmware/dist
