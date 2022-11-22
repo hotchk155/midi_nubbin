@@ -14462,8 +14462,8 @@ Source: http://www.osram.convergy.de/</description>
 <sheets>
 <sheet>
 <plain>
-<text x="-22.86" y="38.1" size="5.08" layer="97">MIDI NUBBIN rev 2</text>
-<text x="-22.86" y="30.48" size="5.08" layer="97">Aug 2022 - Sixty four pixels ltd</text>
+<text x="-22.86" y="38.1" size="5.08" layer="97">MIDI NUBBIN rev 3</text>
+<text x="-22.86" y="30.48" size="5.08" layer="97">Nov 2022 - Sixty four pixels ltd</text>
 <text x="-22.86" y="22.86" size="5.08" layer="97">CC-NC-BY-SA</text>
 <wire x1="-25.4" y1="45.72" x2="-25.4" y2="20.32" width="0.1524" layer="97"/>
 <wire x1="-25.4" y1="20.32" x2="88.9" y2="20.32" width="0.1524" layer="97"/>
