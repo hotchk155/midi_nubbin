@@ -45,6 +45,12 @@
 #include <xc.h>
 
 typedef uint8_t byte;
+
+
+#define MIDI_SYNCH_TICK     	0xf8
+#define MIDI_SYNCH_START    	0xfa
+#define MIDI_SYNCH_CONTINUE 	0xfb
+#define MIDI_SYNCH_STOP     	0xfc
 /*
 
 // #pragma config statements should precede project file includes.
@@ -80,23 +86,56 @@ enum {
 };
 
 #define SZ_BUFFER 64
-volatile byte buf[SZ_BUFFER];
-volatile int head = 0;
-volatile int tail = 0;
+volatile byte tx_buf[SZ_BUFFER];
+volatile int tx_head = 0;
+volatile int tx_tail = 0;
+
+void queue_push(byte ch) 
+{
+    int new_head = tx_head+1;
+    if(new_head >= SZ_BUFFER) {
+        new_head = 0;
+    }
+    if(new_head != tx_tail) {
+        tx_buf[new_head] = ch;
+        tx_head = new_head;
+    }    
+}
+
+void send_byte(byte ch) {
+    if(TX1STAbits.TRMT) {
+        
+    }
+    INTCONbits.GIE = 0;
+    queue_push(ch);
+    INTCONbits.GIE = 1;
+}
+
+int get_next_tx() {    
+    int ret = -1;
+    if(tx_head != tx_tail) {
+        ret = tx_buf[tx_tail];
+        if(++tx_tail >= SZ_BUFFER) {
+            tx_tail - 0;
+        }
+    }
+    return ret;
+}
 
 void __interrupt() ISR()
 {
+    // when a character is available at the serial port
     if(PIR3bits.RC1IF) {
-        volatile byte q = RC1REG;
-        int h = head+1;
-        if(h>=SZ_BUFFER) h = 0;
-        if(h!=tail) {
-            buf[head] = q;
-            head = h;
+        volatile byte ch = RC1REG;
+        switch(ch) {
+            case MIDI_SYNCH_TICK:
+            case MIDI_SYNCH_START:    	
+            case MIDI_SYNCH_CONTINUE: 	
+            case MIDI_SYNCH_STOP:     	            
+                queue_byte(ch);
+                break;
         }
-        else {
-            P_LED2 = 1;
-        }        
+        break;
     }
 }
 
@@ -183,14 +222,10 @@ void main(void) {
     
     //P_LED1 = 1;
     while(1) {
-        
-        if(head != tail) {
-            P_LED1 = 1;
-            send_char(buf[tail]);
-            P_LED1 = 0;
-            tail++;
-            if(tail >= SZ_BUFFER) {
-                tail = 0;
+        if(!TX1STAbits.TRMT) {
+            int next_tx = get_next_tx();
+            if(next_tx >= 0) {
+                TX1REG = (byte)next_tx;                
             }
         }
     }
