@@ -152,8 +152,8 @@
 <circle x="35.382" y="43.732" radius="3" width="0.3048" layer="21"/>
 <circle x="35.382" y="4.108" radius="3" width="0.3048" layer="21"/>
 <circle x="4.648" y="4.108" radius="3" width="0.3048" layer="21"/>
-<text x="2.743" y="38.779" size="2.54" layer="47" font="vector" ratio="20" rot="SR270">MIDI NUBBIN V3</text>
-<text x="8.966" y="44.24" size="1.778" layer="47" font="vector" ratio="20" rot="SR0">hotchk155/2022</text>
+<text x="2.743" y="38.779" size="2.54" layer="21" font="vector" ratio="20" rot="SR270">MIDI NUBBIN V3</text>
+<text x="8.966" y="44.24" size="1.778" layer="21" font="vector" ratio="20" rot="SR0">hotchk155/2022</text>
 <wire x1="26.492" y1="7.918" x2="24.46" y2="7.918" width="0.3048" layer="21"/>
 <wire x1="24.46" y1="7.918" x2="24.46" y2="2.838" width="0.3048" layer="21"/>
 <wire x1="26.492" y1="2.838" x2="24.46" y2="2.838" width="0.3048" layer="21"/>
