@@ -76,6 +76,20 @@ KEY5    RB7 | RB6
 
 #define P_LED1 LATAbits.LATA5
 #define P_LED2 LATCbits.LATC0
+#define P_KEY1 PORTCbits.RC3
+#define P_KEY2 PORTAbits.RA4
+#define P_KEY3 PORTCbits.RC6
+#define P_KEY4 PORTCbits.RC7
+#define P_KEY5 PORTBbits.RB7
+
+#define TRISA_BITS  0b11011111
+#define TRISB_BITS  0b11111111
+#define TRISC_BITS  0b11101110
+
+#define WPUA_BITS   0b00010000
+#define WPUB_BITS   0b10000000
+#define WPUC_BITS   0b11001000
+
 
 enum {
     KEY_1 = (1<<0),
@@ -116,7 +130,7 @@ int get_next_tx() {
     if(tx_head != tx_tail) {
         ret = tx_buf[tx_tail];
         if(++tx_tail >= SZ_BUFFER) {
-            tx_tail - 0;
+            tx_tail = 0;
         }
     }
     return ret;
@@ -132,10 +146,9 @@ void __interrupt() ISR()
             case MIDI_SYNCH_START:    	
             case MIDI_SYNCH_CONTINUE: 	
             case MIDI_SYNCH_STOP:     	            
-                queue_byte(ch);
+                queue_push(ch);
                 break;
         }
-        break;
     }
 }
 
@@ -143,19 +156,19 @@ void __interrupt() ISR()
 
 byte scan_keys() {
     byte result = 0;
-    if(PORTAbits.RA4) {
-        result |= KEY_2;
-    }
-    if(PORTCbits.RC3) {
+    if(!P_KEY1) {
         result |= KEY_1;
     }
-    if(PORTCbits.RC6) {
+    if(!P_KEY2) {
+        result |= KEY_2;
+    }
+    if(!P_KEY3) {
         result |= KEY_3;
     }
-    if(PORTCbits.RC7) {
+    if(!P_KEY4) {
         result |= KEY_4;
     }
-    if(PORTBbits.RB7) {
+    if(!P_KEY5) {
         result |= KEY_5;
     }
     return result;
@@ -163,7 +176,7 @@ byte scan_keys() {
 
 void uart_init() {
     PIR3bits.RC1IF = 0;     
-    PIE3bits.RC1IE = 1;     
+    PIE3bits.RC1IE = 0;     
 
     PIR3bits.TX1IF = 0;     
     PIE3bits.TX1IE = 0;     
@@ -197,16 +210,15 @@ void send_char(byte x) {
 }
 
 void main(void) {
-    TRISA=0b11011111;
-    TRISC=0b11101110;
+    TRISA=TRISA_BITS;
+    TRISB=TRISB_BITS;
+    TRISC=TRISC_BITS;
     ANSELA = 0;
     ANSELB = 0;
     ANSELC = 0;
-    WPUAbits.WPUA4 = 1;
-    WPUCbits.WPUC3 = 1;
-    WPUCbits.WPUC6 = 1;
-    WPUCbits.WPUC7 = 1;
-    WPUBbits.WPUB7 = 1;
+    WPUA=WPUA_BITS;
+    WPUB=WPUB_BITS;
+    WPUC=WPUC_BITS;
     
     
     // Pin RC4 PPS register set to point to UART TX
@@ -217,10 +229,24 @@ void main(void) {
             
     uart_init();
     
-    INTCONbits.GIE = 1;
-    INTCONbits.PEIE = 1;
-    
-    //P_LED1 = 1;
+    //INTCONbits.GIE = 1;
+    //INTCONbits.PEIE = 1;
+
+    int a=0;
+    for(;;) {
+        if(scan_keys()) {
+            P_LED1 = 1;
+            P_LED2 = 1;            
+        }
+        else {
+            P_LED1 = !(a&1);
+            P_LED2 = !(a&2);
+            ++a;
+            __delay_ms(200);
+        }
+        //while(!PIR3bits.RC1IF);
+		//volatile byte ch = RC1REG;
+    }
     while(1) {
         if(!TX1STAbits.TRMT) {
             int next_tx = get_next_tx();
