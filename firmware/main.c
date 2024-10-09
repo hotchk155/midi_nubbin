@@ -22,14 +22,14 @@
 
 // CONFIG3
 #pragma config WDTCPS = WDTCPS_31// WDT Period Select bits (Divider ratio 1:65536; software control of WDTPS)
-#pragma config WDTE = ON        // WDT operating mode (WDT enabled regardless of sleep; SWDTEN ignored)
+#pragma config WDTE = OFF        // WDT operating mode (WDT enabled regardless of sleep; SWDTEN ignored)
 #pragma config WDTCWS = WDTCWS_7// WDT Window Select bits (window always open (100%); software control; keyed access not required)
 #pragma config WDTCCS = SC      // WDT input clock selector (Software Control)
 
 // CONFIG4
 #pragma config BBSIZE = BB512   // Boot Block Size Selection bits (512 words boot block size)
 #pragma config BBEN = OFF       // Boot Block Enable bit (Boot Block disabled)
-#pragma config SAFEN = OFF      // SAF Enable bit (SAF disabled)
+#pragma config SAFEN = ON       // SAF Enable bit 
 #pragma config WRTAPP = OFF     // Application Block Write Protection bit (Application Block not write protected)
 #pragma config WRTB = OFF       // Boot Block Write Protection bit (Boot Block not write protected)
 #pragma config WRTC = OFF       // Configuration Register Write Protection bit (Configuration Register not write protected)
@@ -41,218 +41,13 @@
 
 // #pragma config statements should precede project file includes.
 // Use project enums instead of #define for ON and OFF.
-#define _XTAL_FREQ 32000000
+
 #include <xc.h>
-
-typedef uint8_t byte;
-
-
-#define MIDI_SYNCH_TICK     	0xf8
-#define MIDI_SYNCH_START    	0xfa
-#define MIDI_SYNCH_CONTINUE 	0xfb
-#define MIDI_SYNCH_STOP     	0xfc
-/*
-
-// #pragma config statements should precede project file includes.
-// Use project enums instead of #define for ON and OFF.
- 
-       PIC16F15345
- 
-        VDD | VSS
-LED1    RA5 | RA0
-KEY1    RA4 | RA1
-        RA3 | RA2
-RX      RC5 | RC0       LED2
-TX      RC4 | RC1
-KEY2    RC3 | RC2 
-KEY3    RC6 | RB4
-KEY4    RC7 | RB5   
-KEY5    RB7 | RB6
- 
- */
- 
-// A B
-// C D E
-
-#define P_LED1 LATAbits.LATA5
-#define P_LED2 LATCbits.LATC0
-#define P_KEY1 PORTCbits.RC3
-#define P_KEY2 PORTAbits.RA4
-#define P_KEY3 PORTCbits.RC6
-#define P_KEY4 PORTCbits.RC7
-#define P_KEY5 PORTBbits.RB7
-
-#define TRISA_BITS  0b11011111
-#define TRISB_BITS  0b11111111
-#define TRISC_BITS  0b11101110
-
-#define WPUA_BITS   0b00010000
-#define WPUB_BITS   0b10000000
-#define WPUC_BITS   0b11001000
-
-
-enum {
-    KEY_1 = (1<<0),
-    KEY_2 = (1<<1),
-    KEY_3 = (1<<2),
-    KEY_4 = (1<<3),
-    KEY_5 = (1<<4)
-};
-
-#define SZ_BUFFER 64
-volatile byte tx_buf[SZ_BUFFER];
-volatile int tx_head = 0;
-volatile int tx_tail = 0;
-
-void queue_push(byte ch) 
-{
-    int new_head = tx_head+1;
-    if(new_head >= SZ_BUFFER) {
-        new_head = 0;
-    }
-    if(new_head != tx_tail) {
-        tx_buf[new_head] = ch;
-        tx_head = new_head;
-    }    
-}
-
-void send_byte(byte ch) {
-    if(TX1STAbits.TRMT) {
-        
-    }
-    INTCONbits.GIE = 0;
-    queue_push(ch);
-    INTCONbits.GIE = 1;
-}
-
-int get_next_tx() {    
-    int ret = -1;
-    if(tx_head != tx_tail) {
-        ret = tx_buf[tx_tail];
-        if(++tx_tail >= SZ_BUFFER) {
-            tx_tail = 0;
-        }
-    }
-    return ret;
-}
-
-void __interrupt() ISR()
-{
-    // when a character is available at the serial port
-    if(PIR3bits.RC1IF) {
-        volatile byte ch = RC1REG;
-        switch(ch) {
-            case MIDI_SYNCH_TICK:
-            case MIDI_SYNCH_START:    	
-            case MIDI_SYNCH_CONTINUE: 	
-            case MIDI_SYNCH_STOP:     	            
-                queue_push(ch);
-                break;
-        }
-    }
-}
-
-
-
-byte scan_keys() {
-    byte result = 0;
-    if(!P_KEY1) {
-        result |= KEY_1;
-    }
-    if(!P_KEY2) {
-        result |= KEY_2;
-    }
-    if(!P_KEY3) {
-        result |= KEY_3;
-    }
-    if(!P_KEY4) {
-        result |= KEY_4;
-    }
-    if(!P_KEY5) {
-        result |= KEY_5;
-    }
-    return result;
-}
-
-void uart_init() {
-    PIR3bits.RC1IF = 0;     
-    PIE3bits.RC1IE = 0;     
-
-    PIR3bits.TX1IF = 0;     
-    PIE3bits.TX1IE = 0;     
-    
-    BAUD1CONbits.SCKP = 0;  // synchronous bit polarity 
-    BAUD1CONbits.BRG16 = 1; // enable 16 bit brg
-    BAUD1CONbits.WUE = 0;   // wake up enable off
-    BAUD1CONbits.ABDEN = 0; // auto baud detect
-    
-    //TX1STAbits.TX9 = 0;     // 8 bit transmission
-    TX1STAbits.SYNC = 0;    // async mode
-    //TX1STAbits.SENDB = 0;   // break character
-    TX1STAbits.BRGH = 0;    // high baudrate 
-    //TX1STAbits.TX9D = 0;    // bit 9
-
-    
-    TX1STAbits.TXEN = 1;    // transmit enable
-    RC1STAbits.SPEN = 1;    // serial port enable
-    
-    //RC1STAbits.RX9 = 0;     // 8 bit operation
-    RC1STAbits.SREN = 1;    // enable receiver
-    RC1STAbits.CREN = 1;    // continuous receive enable
-
-    SP1BRGH = 0;            // brg high byte
-    SP1BRGL = 63;            // brg low byte (31250)	 
-}
-
-void send_char(byte x) {
-    TX1REG = x;
-    while(TX1STAbits.TRMT);
-}
+#include "mn.h"
 
 void main(void) {
-    TRISA=TRISA_BITS;
-    TRISB=TRISB_BITS;
-    TRISC=TRISC_BITS;
-    ANSELA = 0;
-    ANSELB = 0;
-    ANSELC = 0;
-    WPUA=WPUA_BITS;
-    WPUB=WPUB_BITS;
-    WPUC=WPUC_BITS;
-    
-    
-    // Pin RC4 PPS register set to point to UART TX
-    RC4PPS = 0x0F;
-    
-    // UART RX PPS register set to point to RC5
-    RX1DTPPS = 0x15;
-            
-    uart_init();
-    
-    //INTCONbits.GIE = 1;
-    //INTCONbits.PEIE = 1;
-
-    int a=0;
+    mn_init();
     for(;;) {
-        if(scan_keys()) {
-            P_LED1 = 1;
-            P_LED2 = 1;            
-        }
-        else {
-            P_LED1 = !(a&1);
-            P_LED2 = !(a&2);
-            ++a;
-            __delay_ms(200);
-        }
-        //while(!PIR3bits.RC1IF);
-		//volatile byte ch = RC1REG;
-    }
-    while(1) {
-        if(!TX1STAbits.TRMT) {
-            int next_tx = get_next_tx();
-            if(next_tx >= 0) {
-                TX1REG = (byte)next_tx;                
-            }
-        }
+        mn_run();
     }
 }
