@@ -252,9 +252,9 @@ void service_buttons() {
 
 ////////////////////////////////////////////////////////////
 void send_char(byte data) {
-    di();
+    //di();
     tx_push(data);
-    ei();
+    //ei();
     PIE3bits.TX1IE = 1;
 }    
 
@@ -274,13 +274,13 @@ void service_midi_in()
 
         // check if character available and pull it from the 
         // buffer, disable interrupts for safe access to buffer
-        di();
+        //di();
         byte ch;
         byte is_avail = rx_avail();
         if(is_avail) {
             ch = rx_pop();
         }
-        ei();
+        //ei();
         
         // exit from loop if no data available
         if(!is_avail) {
@@ -354,7 +354,7 @@ void service_midi_in()
 			}
 		}    
         else if(g_in_sysex) {
-            send_char(data);
+            send_char(ch);
         }
 		else if(g_midi_status)
         {

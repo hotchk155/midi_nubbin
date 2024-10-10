@@ -16,7 +16,7 @@
 // Device remembers notes that are playing so that they can be stopped
 // after transposition
 
-#if 1
+#if 0
 #include <xc.h>
 #include "mn.h"
 

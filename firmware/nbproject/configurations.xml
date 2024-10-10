@@ -24,6 +24,7 @@
                    projectFiles="false">
       <itemPath>Makefile</itemPath>
     </logicalFolder>
+    <itemPath>dachord.c</itemPath>
   </logicalFolder>
   <sourceRootList>
     <Elem>.</Elem>
