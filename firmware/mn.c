@@ -23,13 +23,6 @@ KEY5    RB7 | RB6
 
 #define SAF_ADDR 0x1f80 // address of Storage Area Flash block
 
-#define P_LED1 LATAbits.LATA5
-#define P_LED2 LATCbits.LATC0
-#define P_KEY1 PORTCbits.RC3
-#define P_KEY2 PORTAbits.RA4
-#define P_KEY3 PORTCbits.RC6
-#define P_KEY4 PORTCbits.RC7
-#define P_KEY5 PORTBbits.RB7
 
 #define TRISA_BITS  0b11011111
 #define TRISB_BITS  0b11111111
@@ -63,11 +56,12 @@ byte g_led1_timeout;
 byte g_led2_timeout;
 int g_debounce_timeout;
 int g_long_press_timeout;
-byte g_midi_status = 0;					// current MIDI message status (running status)
-byte g_midi_num_params = 0;				// number of parameters needed by current MIDI message
+byte g_midi_status;					// current MIDI message status (running status)
+byte g_midi_num_params;				// number of parameters needed by current MIDI message
 byte g_midi_params[2];					// parameter values of current MIDI message
-byte g_midi_param = 0;					// number of params currently received
-byte g_in_sysex = 0;
+byte g_midi_param;					// number of params currently received
+byte g_in_sysex;
+MNApp g_app;
 
 //////////////////////////////////////////
 void rx_push(byte data) {
@@ -233,14 +227,14 @@ void service_buttons() {
             g_long_press_timeout = LONG_PRESS_TIMEOUT;
             byte keys_down = diff_keys & this_keys;
             if(keys_down) {
-                app_key_event(EV_KEY_DOWN, keys_down);
+                g_app.app_key_event(EV_KEY_DOWN, keys_down);
             }
             g_last_keys = this_keys;
         }
         else if(this_keys) {            
             if(g_long_press_timeout) {
                 if(!--g_long_press_timeout) {
-                    app_key_event(EV_KEY_HOLD, this_keys);                    
+                    g_app.app_key_event(EV_KEY_HOLD, this_keys);                    
                 }
             }
         }
@@ -298,7 +292,7 @@ void service_midi_in()
 			case MIDI_SYNCH_CONTINUE:
 			case MIDI_SYNCH_STOP:
                 // these messages can appear at any point in the data
-                app_midi_realtime(ch);
+                g_app.app_midi_realtime(ch);
                 break;
 			// SYSTEM COMMON MESSAGES WITH PARAMETERS
 			case MIDI_MTC_QTR_FRAME:	// 1 param byte follows
@@ -339,19 +333,19 @@ void service_midi_in()
 			g_midi_status = ch; 
 			switch(ch & 0xF0)
 			{
-			case 0xC0: //  Patch change  1  instrument #   
-			case 0xD0: //  Channel Pressure  1  pressure  
-				g_midi_num_params = 1;
-				break;    
-			case 0xA0: //  Polyphonic aftertouch  2  key  touch  
-			case 0x80: //  Note-off  2  key  velocity  
-			case 0x90: //  Note-on  2  key  veolcity  
-			case 0xB0: //  Continuous controller  2  controller #  controller value  
-			case 0xE0: //  Pitch bend  2  lsb (7 bits)  msb (7 bits)  
-			default:
-				g_midi_num_params = 2;
-				break;        
-			}
+                case MIDI_STATUS_PATCH_CHANGE:
+                case MIDI_STATUS_CHAN_PRESSURE:
+    				g_midi_num_params = 1;
+        			break;    
+                case MIDI_STATUS_POLY_AFTERTOUCH:
+                case MIDI_STATUS_NOTE_OFF:
+                case MIDI_STATUS_NOTE_ON:
+                case MIDI_STATUS_CC:
+                case MIDI_STATUS_PITCH_BEND:
+                default:
+                    g_midi_num_params = 2;
+                    break;        
+			}                       
 		}    
         else if(g_in_sysex) {
             send_char(ch);
@@ -364,7 +358,7 @@ void service_midi_in()
             {
                 // we have a complete message
                 g_midi_param = 0;
-                app_midi_msg(g_midi_status, g_midi_num_params, g_midi_params[0], g_midi_params[1]);
+                g_app.app_midi_msg(g_midi_status, g_midi_num_params, g_midi_params[0], g_midi_params[1]);
             }
         }
 	}
@@ -513,7 +507,6 @@ void mn_init() {
 
     uart_init();
     timer_init();
-    app_init();
 
 	// enable interrupts	
     INTCONbits.PEIE = 1;
@@ -527,9 +520,9 @@ void mn_run() {
     if(g_ms_tick) {
         service_buttons();
         service_leds();
-        app_tick();
+        g_app.app_tick();
         g_ms_tick = 0;
     }
-    app_run();        
+    g_app.app_run();        
 }
 

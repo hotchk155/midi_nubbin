@@ -44,10 +44,46 @@
 
 #include <xc.h>
 #include "mn.h"
+#include "mn_utils.h"
 
-void main(void) {
+MNApp g_app;
+PRIVATE void app_key_event(byte event, byte keys){    
+    // empty
+}
+PRIVATE void app_midi_realtime(byte data) {
+    // pass through
+    mn_send_midi_realtime(data);
+}
+PRIVATE void app_midi_msg(byte status, byte num_params, byte param1, byte param2) {
+    // pass through
+    mn_send_midi_msg(status, num_params, param1, param2);
+}
+PRIVATE void app_tick(void) { 
+    // empty
+}
+PRIVATE void app_run(void) {   
+    // empty
+}
+
+void main(void) {    
+    // initialise default handlers
+    g_app.app_key_event = app_key_event;
+    g_app.app_midi_realtime = app_midi_realtime;
+    g_app.app_midi_msg = app_midi_msg;
+    g_app.app_tick = app_tick;
+    g_app.app_run = app_run;      
+    
+    // initialise the basics
     mn_init();
+
+    // initialise the utils
+    mn_utils_init();
+    
+    // initialise the specific app to run
+    //app_init_chordstrum();
+    app_init_da_chord();
     for(;;) {
+        // run the application
         mn_run();
     }
 }

@@ -14,15 +14,32 @@
 // channel are manipulated. All other MIDI is passed through unchanged
 //
 
-#if 1
+#if 0
 #include <xc.h>
 #include <string.h>
 #include "mn.h"
 #include "mn_utils.h"
 
-PRIVATE byte g_chord_vel;
-PRIVATE byte g_chord_root;
+byte g_current_pos;
+byte g_chord_vel;
+byte g_chord_root;
 
+////////////////////////////////////////////////////////////////////////////////
+// chan / note = the note the user has played
+// scale_root = the root note the scale
+// scale = definition of chords in the scale
+// vel = 0 to stop the chord
+PRIVATE void select_chord(byte note) {
+    byte triad[3]; 
+    mn_build_triad(note, triad);        
+    mn_clear_note_array();
+    for(int i=0; i<3; ++i) {
+        while(triad[i]<128) {
+            g_note_array[triad[i]] = 1;
+            triad[i] += 12;
+        }
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void on_note(byte note, byte vel) {
@@ -36,37 +53,43 @@ PRIVATE void on_note(byte note, byte vel) {
                
         // stop any notes of the currently playing chord
         mn_note_array_off();
-        mn_clear_note_array();
         
         // if there is a new chord to play
         g_chord_root = root;
         if(g_chord_root != NO_NOTE) {
-            
+            // if its a note on event then remember the velocity
             if(vel) {
-                g_chord_vel = vel;// if its a note on event then remember the velocity
+                g_chord_vel = vel;
             }
-            
-            // build the chord
-            byte triad[3]; 
-            mn_build_triad(g_chord_root, triad);        
-            mn_add_note_to_array(triad[0]);
-            mn_add_note_to_array(triad[1]);
-            mn_add_note_to_array(triad[2]);
-            mn_add_note_to_array(triad[0]+12);
-            mn_note_array_on(g_chord_vel);
+            // and switch to the new chord
+            select_chord(g_chord_root, NOTE_C, g_maj_scale);
+            mn_blink_right();
+        }
+    }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// pitch bend is 0-16384
+PRIVATE void strum(int pos) {    
+    if(g_chan != NO_CHAN) {
+        pos >>= 7; // convert 14 bits to 7 bits
+        while(pos != g_current_pos) {
+            if(g_note_array[g_current_pos]) {
+                mn_send_midi_msg(MIDI_STATUS_NOTE_ON|g_chan, 2, (byte)pos, g_chord_vel);                
+            }
+            g_current_pos = (g_current_pos < pos)? (g_current_pos+1) : (g_current_pos-1);
         }
     }
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void reset() {
-    mn_note_array_off();
-    mn_pop_all_notes();
-    g_mn.enabled = 1;
-    g_mn.chan = NO_CHAN;
-    g_mn.split_point = 0;
-    g_mn.apply_above_split = 1;
+    g_chan = NO_CHAN;
+    g_chord_root = NO_NOTE;
     g_chord_vel = 0;
+    g_current_pos = 64;
+    g_enabled = 1;
+    mn_set_left(1);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,37 +97,25 @@ PRIVATE void app_key_event(byte event, byte keys) {
     if(event == EV_KEY_DOWN) {
         switch(keys) {
             case KEY_1: 
-                g_mn.scale = g_min_scale;      
-                g_mn.scale_root = NOTE_A;
                 break;
             case KEY_2: 
-                g_mn.scale = g_maj_scale;                
-                g_mn.scale_root = NOTE_C;
                 break;
             case KEY_3: 
-                g_mn.apply_above_split = 0;
                 break;
             case KEY_4: 
-                g_mn.apply_above_split = 1;
                 break;
             case KEY_5: // toggle on/off
-                g_mn.enabled = !g_mn.enabled;
-                mn_pop_all_notes();
+                g_enabled = !g_enabled;
+                mn_set_left(g_enabled);
                 mn_note_array_off();
                 break;
         }
     }
     else if(event == EV_KEY_HOLD) {
         switch(keys) {        
-            case KEY_1: 
-            case KEY_2: 
-                g_mn.scale_root = NO_NOTE;
-                break;
-            case KEY_3: 
-            case KEY_4:                
-                g_mn.split_point = NO_NOTE;
-                break;
-            case KEY_5: // RESET
+            case KEY_5: // reset
+                mn_blink_right();
+                mn_note_array_off();
                 reset();
                 break;
         }
@@ -112,26 +123,28 @@ PRIVATE void app_key_event(byte event, byte keys) {
 }
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void app_midi_msg(byte status, byte num_params, byte param1, byte param2) {    
-    if(g_mn.enabled) {
-        mn_app_std_midi_msg(status, num_params, param1, param2);
-        if(status == (MIDI_STATUS_NOTE_ON|g_mn.chan) &&
-            mn_app_apply_to_note(param1)) {            
-            on_note(param1, param2);
-            return;
-        }
-        if(status == (MIDI_STATUS_NOTE_OFF|g_mn.chan) &&
-            mn_app_apply_to_note(param1)) {
-            on_note(param1, 0);
-            return;
+    byte pass = 1;
+    if(g_enabled && g_chan == (status & 0x0F)) {
+        switch(status & 0xF0) {
+            case MIDI_STATUS_NOTE_ON:
+                on_note(param1, param2);
+                pass = 0;
+                break;
+            case MIDI_STATUS_PITCH_BEND:
+                strum((int)param1 | ((int)param2<<7));
+                pass = 0;
+                break;
         }
     }
-    mn_send_midi_msg(status, num_params, param1, param2);
+    if(pass) {
+        mn_send_midi_msg(status, num_params, param1, param2);
+    }
 }
 ////////////////////////////////////////////////////////////////////////////////
-PUBLIC void app_init_da_chord() {
+PUBLIC void app_init_chordstrum() {
     g_app.app_key_event = app_key_event;
     g_app.app_midi_msg = app_midi_msg;    
-    g_app.app_tick = mn_app_std_leds;
+    mn_pop_all_notes();
     reset();
 }
 
