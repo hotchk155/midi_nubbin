@@ -7,9 +7,13 @@
 #include "mn.h"
 #include "mn_utils.h"
 
-PRIVATE byte g_current_pos;
-PRIVATE byte g_chord_vel;
-PRIVATE byte g_chord_root;
+typedef struct {
+    byte current_pos;
+    byte chord_vel;
+    byte chord_root;
+} APP_STATE;
+PRIVATE APP_STATE g_st;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void on_note(byte note, byte vel) {
@@ -19,29 +23,28 @@ PRIVATE void on_note(byte note, byte vel) {
     byte root = vel? mn_push_note(note) : mn_pop_note(note);
     
     // is there any change to chord currently playing?
-    if(root != g_chord_root) {        
+    if(root != g_st.chord_root) {        
                
         // stop any notes of the currently playing chord
         mn_note_array_off();
         mn_clear_note_array();
         
         // if there is a new chord to play
-        g_chord_root = root;
-        if(g_chord_root != NO_NOTE) {
+        g_st.chord_root = root;
+        if(g_st.chord_root != NO_NOTE) {
             
             if(vel) {
-                g_chord_vel = vel;// if its a note on event then remember the velocity
+                g_st.chord_vel = vel;// if its a note on event then remember the velocity
             }
             // build the chord
             byte triad[3]; 
-            mn_build_triad(g_chord_root%12, triad);        
+            mn_build_triad(g_st.chord_root%12, triad);        
             for(int i=0; i<3; ++i) {
                 while(triad[i]<128) {
                     mn_add_note_to_array(triad[i]);
                     triad[i] += 12;
                 }
             }
-
         }
     }
 }
@@ -54,9 +57,9 @@ PRIVATE void reset() {
     g_mn.chan = NO_CHAN;
     g_mn.split_point = 0;
     g_mn.apply_above_split = 1;
-    g_current_pos = 64;
-    g_chord_vel = 0;
-    g_chord_root = NO_NOTE;
+    g_st.current_pos = 64;
+    g_st.chord_vel = 0;
+    g_st.chord_root = NO_NOTE;
 }
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void app_key_event(byte event, byte keys) {
@@ -64,11 +67,9 @@ PRIVATE void app_key_event(byte event, byte keys) {
         switch(keys) {
             case KEY_1: 
                 g_mn.scale = g_min_scale;      
-                g_mn.scale_root = NOTE_A;
                 break;
             case KEY_2: 
                 g_mn.scale = g_maj_scale;                
-                g_mn.scale_root = NOTE_C;
                 break;
             case KEY_3: 
                 g_mn.apply_above_split = 0;
@@ -102,14 +103,23 @@ PRIVATE void app_key_event(byte event, byte keys) {
 }
 ///////////////////////////////////////////////////////////////////////////////
 // pos = 0-127
-PRIVATE void strum(byte pos) {    
-    while(g_current_pos != pos) {
-        mn_note_array_note_on(g_current_pos, g_chord_vel);
-        if(g_current_pos < pos) {
-            ++g_current_pos;
+PRIVATE void strum(byte strum_pos) {  
+    
+    int pos = g_st.chord_root - 36 + (72 * strum_pos)/128;
+    if(pos < 0) {
+        pos = 0;
+    }
+    if(pos > 127) {
+        pos = 127;
+    }
+    
+    while(g_st.current_pos != pos) {
+        mn_note_array_note_on(g_st.current_pos, g_st.chord_vel);
+        if(g_st.current_pos < pos) {
+            ++g_st.current_pos;
         }
         else {
-            --g_current_pos;
+            --g_st.current_pos;
         }
     }
 }
@@ -127,15 +137,15 @@ PRIVATE void app_midi_msg(byte status, byte num_params, byte param1, byte param2
             on_note(param1, 0);
             return;
         }
-        //if(status == (MIDI_STATUS_PITCH_BEND|g_mn.chan)) {
-        //    int value = ((int)param1) | (((int)param2)<<7);
-        //    strum((byte)(value>>7));
-        //    return;
-        //}                   
         if(status == (MIDI_STATUS_CC|g_mn.chan) && param1 == 1) {
             strum(param2);
             return;
         }                   
+    }
+    else {
+        // track note messages on the selected channel so that ON notes can be 
+        // muted when the effect is turned on
+        mn_note_array_track_note_msg(status, num_params, param1, param2);
     }
     mn_send_midi_msg(status, num_params, param1, param2);
 }

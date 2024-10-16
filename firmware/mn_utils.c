@@ -81,6 +81,20 @@ void mn_note_array_off() {
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
+void mn_note_array_track_note_msg(byte status, byte num_params, byte note, byte vel) {
+    if(status == (MIDI_STATUS_NOTE_ON|g_mn.chan)) {
+        if(vel) {
+            g_note_array[note] |= (NOTE_IS_VALID|NOTE_IS_PLAYING);        
+        }
+        else {
+            g_note_array[note] &= ~(NOTE_IS_VALID|NOTE_IS_PLAYING);                    
+        }
+    }
+    else if(status == (MIDI_STATUS_NOTE_OFF|g_mn.chan)) {
+        g_note_array[note] &= ~(NOTE_IS_VALID|NOTE_IS_PLAYING);                            
+    }
+}
+////////////////////////////////////////////////////////////////////////////////
 void _dump_stack() {
     for(byte i=0; i<g_note_stack_size; ++i) {
         mn_send_midi_msg(MIDI_STATUS_NOTE_ON|1, 2, i, g_note_stack[i]);    

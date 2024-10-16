@@ -80,8 +80,8 @@ void main(void) {
     mn_utils_init();
     
     // initialise the specific app to run
-    //app_init_chord_strum();
-    app_init_da_chord();
+    app_init_chord_strum();
+    //app_init_da_chord();
     for(;;) {
         // run the application
         mn_run();
