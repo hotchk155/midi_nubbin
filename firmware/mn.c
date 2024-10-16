@@ -106,6 +106,11 @@ byte tx_avail() {
     return (g_tx_tail != g_tx_head);
 }
 //////////////////////////////////////////
+byte tx_full() {
+    int next = (g_tx_head+1)&TX_Q_MASK;    
+    return (next == g_tx_tail);
+}
+//////////////////////////////////////////
 void __interrupt() ISR()
 {
     // when a character is available at the serial port
@@ -246,6 +251,7 @@ void service_buttons() {
 
 ////////////////////////////////////////////////////////////
 void send_char(byte data) {
+    while(tx_full());
     //di();
     tx_push(data);
     //ei();

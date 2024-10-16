@@ -41,6 +41,7 @@ void mn_build_triad(byte root, byte *dest);
 void mn_clear_note_array(void);
 void mn_add_note_to_array(byte note);
 void mn_note_array_on(byte vel);
+void mn_note_array_note_on(byte index, byte vel);
 void mn_note_array_off(void);
 void mn_app_std_leds();
 void mn_app_std_midi_msg(byte status, byte num_params, byte param1, byte param2);

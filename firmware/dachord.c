@@ -1,18 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
-// MIDI NUBBIN : CHORD STRUM
+// MIDI NUBBIN : DA CHORD
 // Chord maker with strumming via the pitch bend wheel
-//
-// Button assignments
-// [OCTAVES-1]      [OCTAVES+1]
-// [MINOR]          [MAJOR]         [ENABLE]
-//
-// [ENABLE] toggles the device on and off 
-// Long press of [ENABLE] performs a reset
-//
-// The MIDI channel and root note are "learned" from the first NOTE ON 
-// message that is received following power up or reset. Only notes on this 
-// channel are manipulated. All other MIDI is passed through unchanged
-//
 
 #if 1
 #include <xc.h>
@@ -22,7 +10,6 @@
 
 PRIVATE byte g_chord_vel;
 PRIVATE byte g_chord_root;
-
 
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void on_note(byte note, byte vel) {
@@ -54,10 +41,10 @@ PRIVATE void on_note(byte note, byte vel) {
             mn_add_note_to_array(triad[2]);
             mn_add_note_to_array(triad[0]+12);
             mn_note_array_on(g_chord_vel);
+            mn_blink_right();
         }
     }
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void reset() {
     mn_note_array_off();
@@ -67,8 +54,8 @@ PRIVATE void reset() {
     g_mn.split_point = 0;
     g_mn.apply_above_split = 1;
     g_chord_vel = 0;
+    g_chord_root = NO_NOTE;
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void app_key_event(byte event, byte keys) {
     if(event == EV_KEY_DOWN) {
@@ -134,6 +121,5 @@ PUBLIC void app_init_da_chord() {
     g_app.app_tick = mn_app_std_leds;
     reset();
 }
-
 #endif
 

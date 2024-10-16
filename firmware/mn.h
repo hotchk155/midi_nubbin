@@ -74,5 +74,5 @@ void mn_init(void);
 void mn_run(void);
 
 ///////////////////////////////////////////////////
-void app_init_chordstrum(void);
-void app_init_da_chord();
+void app_init_chord_strum(void);
+void app_init_da_chord(void);

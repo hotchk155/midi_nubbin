@@ -7,7 +7,9 @@ MN_STD_STATE g_mn;
 
 // general purpose array of 128 bytes 
 PRIVATE byte g_note_array[128];
-        
+#define NOTE_IS_VALID 0x01        
+#define NOTE_IS_PLAYING 0x02
+
 #define SZ_NOTE_STACK  8
 PRIVATE byte g_note_stack_size;
 PRIVATE byte g_note_stack[SZ_NOTE_STACK];// highest note at position 0
@@ -49,32 +51,41 @@ void mn_clear_note_array() {
 ////////////////////////////////////////////////////////////////////////////////
 void mn_add_note_to_array(byte note) {
     if(note<128) {
-        g_note_array[note] = 1;
+        g_note_array[note] = NOTE_IS_VALID;
+    }
+}
+////////////////////////////////////////////////////////////////////////////////
+void mn_note_array_note_on(byte index, byte vel) {
+    if(index<128 && (g_note_array[index] & NOTE_IS_VALID)) {
+        mn_send_midi_msg(MIDI_STATUS_NOTE_ON|g_mn.chan, 2, index, vel);    
+        g_note_array[index] |= NOTE_IS_PLAYING;
+    }
+}
+////////////////////////////////////////////////////////////////////////////////
+void mn_note_array_note_off(byte index) {
+    if(index<128 && (g_note_array[index] & NOTE_IS_VALID)) {
+        mn_send_midi_msg(MIDI_STATUS_NOTE_ON|g_mn.chan, 2, index, 0);    
+        g_note_array[index] &= ~NOTE_IS_PLAYING;
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
 void mn_note_array_on(byte vel) {
     for(byte i = 0; i<128; ++i) {
-        if(g_note_array[i]) {
-            mn_send_midi_msg(MIDI_STATUS_NOTE_ON|g_mn.chan, 2, i, vel);    
-        }
+        mn_note_array_note_on(i, vel);
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
 void mn_note_array_off() {
     for(byte i = 0; i<128; ++i) {
-        if(g_note_array[i]) {
-            mn_send_midi_msg(MIDI_STATUS_NOTE_ON|g_mn.chan, 2, i, 0);    
-        }
+        mn_note_array_note_off(i);
     }
 }
-
+////////////////////////////////////////////////////////////////////////////////
 void _dump_stack() {
     for(byte i=0; i<g_note_stack_size; ++i) {
         mn_send_midi_msg(MIDI_STATUS_NOTE_ON|1, 2, i, g_note_stack[i]);    
     }
 }
-
 ////////////////////////////////////////////////////////////////////////////////
 byte mn_push_note(byte note) {
     int pos;
