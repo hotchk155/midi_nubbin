@@ -152,6 +152,7 @@ PRIVATE void chord_note(byte **dest, byte note) {
     **dest = (note<128)? note:NO_NOTE;
     ++(*dest);
 }
+////////////////////////////////////////////////////////////////////////////////
 void mn_build_triad(byte root, byte *dest) {    
     byte note_in_scale = (byte)(12 + root - g_mn.scale_root)%12;    
     switch(g_mn.scale[note_in_scale]) {
@@ -177,6 +178,7 @@ void mn_build_triad(byte root, byte *dest) {
             break;
     }
 }
+////////////////////////////////////////////////////////////////////////////////
 void mn_utils_init() {
     mn_pop_all_notes();
     mn_clear_note_array();
@@ -187,8 +189,7 @@ void mn_utils_init() {
     g_mn.split_point = 0;
     g_mn.apply_above_split = 1;
 }
-
-
+////////////////////////////////////////////////////////////////////////////////
 void mn_app_std_leds() {
     static byte ticker;
     if(!g_mn.enabled) {
@@ -202,7 +203,7 @@ void mn_app_std_leds() {
         P_LED1 = 1;
     }
 }
-
+////////////////////////////////////////////////////////////////////////////////
 void mn_app_std_midi_msg(byte status, byte num_params, byte param1, byte param2) {
     if(((status & 0xF0) == MIDI_STATUS_NOTE_ON) && param2) {       
         byte chan = status & 0x0F;
@@ -217,6 +218,7 @@ void mn_app_std_midi_msg(byte status, byte num_params, byte param1, byte param2)
         }
     }
 }
+////////////////////////////////////////////////////////////////////////////////
 byte mn_app_apply_to_note(byte note) {
     if(g_mn.split_point == NO_NOTE) {
         return 1;
