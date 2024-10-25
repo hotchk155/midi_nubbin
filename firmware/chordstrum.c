@@ -7,12 +7,57 @@
 #include "mn.h"
 #include "mn_utils.h"
 
+enum {
+    STRUM_NONE,
+    STRUM_UP,
+    STRUM_DOWN
+};
 typedef struct {
     byte current_pos;
     byte chord_vel;
     byte chord_root;
+    byte strum_pos;
+    byte strum_dir;
+    byte strum_period;
+    byte tick_count;
 } APP_STATE;
 PRIVATE APP_STATE g_st;
+
+///////////////////////////////////////////////////////////////////////////////
+// pos = 0-127
+PRIVATE byte map_strum(byte strum_pos) {  
+    int pos = g_st.chord_root - 36 + (72 * strum_pos)/128;
+    if(pos < 0) {
+        return 0;
+    }
+    if(pos > 127) {
+        return 127;
+    }    
+    return(byte)pos;
+}
+
+PRIVATE void strum_to(byte strum_pos) {      
+    byte pos = map_strum(strum_pos);
+    while(g_st.current_pos != pos) {
+        mn_note_array_note_on(g_st.current_pos, g_st.chord_vel);
+        if(g_st.current_pos < pos) {
+            ++g_st.current_pos;
+        }
+        else {
+            --g_st.current_pos;
+        }
+    }
+}
+PRIVATE void strum_begin() {  
+    g_st.current_pos = g_st.chord_root;
+    mn_note_array_note_on(g_st.chord_root, g_st.chord_vel);
+    g_st.strum_pos = g_st.current_pos;     
+    g_st.strum_dir = STRUM_UP;
+    g_st.tick_count = 0;
+}
+PRIVATE void strum_end() {  
+    g_st.strum_dir = STRUM_NONE;
+}
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -45,6 +90,10 @@ PRIVATE void on_note(byte note, byte vel) {
                     triad[i] += 12;
                 }
             }
+            strum_begin();            
+        }
+        else {
+            strum_end();
         }
     }
 }
@@ -60,6 +109,8 @@ PRIVATE void reset() {
     g_st.current_pos = 64;
     g_st.chord_vel = 0;
     g_st.chord_root = NO_NOTE;
+    g_st.strum_dir = STRUM_NONE;    
+    g_st.strum_period = 10;
 }
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void app_key_event(byte event, byte keys) {
@@ -101,28 +152,38 @@ PRIVATE void app_key_event(byte event, byte keys) {
         }
     }
 }
-///////////////////////////////////////////////////////////////////////////////
-// pos = 0-127
-PRIVATE void strum(byte strum_pos) {  
+////////////////////////////////////////////////////////////////////////////////
+PRIVATE void app_tick() {
+    mn_app_std_leds();
     
-    int pos = g_st.chord_root - 36 + (72 * strum_pos)/128;
-    if(pos < 0) {
-        pos = 0;
-    }
-    if(pos > 127) {
-        pos = 127;
-    }
-    
-    while(g_st.current_pos != pos) {
-        mn_note_array_note_on(g_st.current_pos, g_st.chord_vel);
-        if(g_st.current_pos < pos) {
-            ++g_st.current_pos;
-        }
-        else {
-            --g_st.current_pos;
+    if(g_st.strum_dir != STRUM_NONE) {
+        if(++g_st.tick_count >= g_st.strum_period) {
+            g_st.tick_count = 0;
+            switch(g_st.strum_dir) {
+                case STRUM_UP:
+                    if(g_st.strum_pos >= 127) {
+                        g_st.strum_pos = 126;
+                        g_st.strum_dir = STRUM_DOWN;
+                    }
+                    else {
+                        ++g_st.strum_pos;
+                    }
+                    break;
+                case STRUM_DOWN:
+                    if(!g_st.strum_pos) {
+                        g_st.strum_pos = 1;
+                        g_st.strum_dir = STRUM_UP;
+                    }
+                    else {
+                        --g_st.strum_pos;
+                    }
+                    break;
+            }
+            strum_to(g_st.strum_pos);
         }
     }
 }
+
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void app_midi_msg(byte status, byte num_params, byte param1, byte param2) {    
     if(g_mn.enabled) {
@@ -138,7 +199,10 @@ PRIVATE void app_midi_msg(byte status, byte num_params, byte param1, byte param2
             return;
         }
         if(status == (MIDI_STATUS_CC|g_mn.chan) && param1 == 1) {
-            strum(param2);
+            if(g_st.strum_dir == STRUM_NONE) {
+                strum_to(param2);
+            }
+            g_st.strum_period = (127-param2)/4;
             return;
         }                   
     }
@@ -153,7 +217,7 @@ PRIVATE void app_midi_msg(byte status, byte num_params, byte param1, byte param2
 PUBLIC void app_init_chord_strum() {
     g_app.app_key_event = app_key_event;
     g_app.app_midi_msg = app_midi_msg;    
-    g_app.app_tick = mn_app_std_leds;
+    g_app.app_tick = app_tick;
     reset();
 }
 

@@ -84,11 +84,31 @@ LDLIBSOPTIONS=
 # fixDeps replaces a bunch of sed/cat/printf statements that slow down the build
 FIXDEPS=fixDeps
 
+# The following macros may be used in the pre and post step lines
+_/_=\\
+ShExtension=.bat
+Device=PIC16F15345
+ProjectDir="C:\Users\jason\Dropbox\Github\midi_nubbin\firmware"
+ProjectName=midi_nubbin
+ConfName=default
+ImagePath="${DISTDIR}\firmware.${IMAGE_TYPE}.${OUTPUT_SUFFIX}"
+ImageDir="${DISTDIR}"
+ImageName="firmware.${IMAGE_TYPE}.${OUTPUT_SUFFIX}"
+ifeq ($(TYPE_IMAGE), DEBUG_RUN)
+IsDebug="true"
+else
+IsDebug="false"
+endif
+
 .build-conf:  ${BUILD_SUBPROJECTS}
 ifneq ($(INFORMATION_MESSAGE), )
 	@echo $(INFORMATION_MESSAGE)
 endif
 	${MAKE}  -f nbproject/Makefile-default.mk ${DISTDIR}/firmware.${IMAGE_TYPE}.${OUTPUT_SUFFIX}
+	@echo "--------------------------------------"
+	@echo "User defined post-build step: [${ProjectDir}\HexToSyx.exe i ${ImagePath} ${ImageDir}\midi_nubbin.syx]"
+	@${ProjectDir}\HexToSyx.exe i ${ImagePath} ${ImageDir}\midi_nubbin.syx
+	@echo "--------------------------------------"
 
 MP_PROCESSOR_OPTION=16F15345
 # ------------------------------------------------------------------------------------

@@ -39,3 +39,5 @@ firmware/dist
 firmware/.generated-cmakefiles
 firmware/_build_mplab
 firmware/out
+firmware/HexToSyx.exe
+case/Backup_of_midi_nubbin-case.cdr
