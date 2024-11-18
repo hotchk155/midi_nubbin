@@ -24,6 +24,9 @@ enum {
     KEY_5 = (1<<4)
 };
 
+
+
+
 const byte NO_NOTE = 0xff;
 const byte NO_CHAN = 0xff;
 

@@ -33,7 +33,7 @@ extern MN_STD_STATE g_mn;
 extern const byte g_maj_scale[12];
 extern const byte g_min_scale[12];
 
-void mn_utils_init(void);
+void mn_utils_reset(void);
 byte mn_push_note(byte note);
 byte mn_pop_note(byte note);
 void mn_pop_all_notes(void);

@@ -51,13 +51,7 @@ PRIVATE void on_note(byte note, byte vel) {
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void reset() {
     mn_note_array_off();
-    mn_pop_all_notes();
-    g_mn.enabled = 1;
-    g_mn.chan = NO_CHAN;
-    g_mn.split_point = 0;
-    g_mn.apply_above_split = 1;
-    g_mn.scale = g_maj_scale;                
-    g_mn.scale_root = NOTE_C;
+    mn_utils_reset();
     g_st.chord_vel = 0;
     g_st.chord_root = NO_NOTE;
 }

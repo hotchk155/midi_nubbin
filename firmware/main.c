@@ -1,8 +1,12 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// M I D I   N U B B I N 
+//
+////////////////////////////////////////////////////////////////////////////////
+
 
 // PIC16F15345 Configuration Bit Settings
-
 // 'C' source line config statements
-
 // CONFIG1
 #pragma config FEXTOSC = OFF    // External Oscillator mode selection bits (Oscillator not enabled)
 #pragma config RSTOSC = HFINTPLL// Power-up default value for COSC bits (HFINTOSC with 2x PLL, with OSCFRQ = 16 MHz and CDIV = 1:1 (FOSC = 32 MHz))
@@ -77,7 +81,7 @@ void main(void) {
     mn_init();
 
     // initialise the utils
-    mn_utils_init();
+    mn_utils_reset();
     
     // initialise the specific app to run
     app_init_chord_strum();

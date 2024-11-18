@@ -179,7 +179,7 @@ void mn_build_triad(byte root, byte *dest) {
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-void mn_utils_init() {
+void mn_utils_reset() {
     mn_pop_all_notes();
     mn_clear_note_array();
     g_mn.scale = g_maj_scale;

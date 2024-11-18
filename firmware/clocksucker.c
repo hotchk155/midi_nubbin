@@ -1,69 +1,49 @@
 #include <xc.h>
 #include "mn.h"
-#if 0
+#if 1
 typedef struct {
-    FWORD cookie;
-    FWORD pass_transport;
-} APP_CONFIG;
-const FWORD APP_COOKIE = 0x15a1; // 14 bits max
+    byte is_running;    
+    byte tick_count;
+    byte ticks_to_drop;
+} APP_STATE;
+PRIVATE APP_STATE g_st;
 
-int g_is_running;
-int g_tick_count;
-int g_ticks_to_drop;
-APP_CONFIG g_cfg;
-
-////////////////////////////////////////////////////////////////////////////////
-void load_config() {
-    // set defaults
-    g_cfg.pass_transport = 0;
-    
-    APP_CONFIG cfg = {0};
-    mn_saf_read((byte*)&g_cfg, sizeof g_cfg);
-    if(cfg.cookie == APP_COOKIE) {
-        g_cfg = cfg;
-    }
-}
-////////////////////////////////////////////////////////////////////////////////
-void save_config() {
-    g_cfg.cookie = APP_COOKIE;
-    mn_saf_write((byte*)&g_cfg, sizeof g_cfg);
-}
 ////////////////////////////////////////////////////////////////////////////////
 void send_tick_out() {
     mn_send_midi_realtime(MIDI_SYNCH_TICK);
-    if(!g_tick_count) {
+    if(!g_st.tick_count) {
         mn_blink_right();
     }
-    if(++g_tick_count >= 6) {
-        g_tick_count = 0;
+    if(++g_st.tick_count >= 6) {
+        g_st.tick_count = 0;
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
 void on_start() {
-    g_is_running = 1;
-    mn_set_left(1);
-    g_tick_count = 0;
-    g_ticks_to_drop = 0;
+    g_st.is_running = 1;
+    g_st.tick_count = 0;
+    g_st.ticks_to_drop = 0;
     mn_send_midi_realtime(MIDI_SYNCH_START);    
+    mn_set_left(1);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void on_stop() {
-    g_is_running = 0;
-    mn_set_left(0);
+    g_st.is_running = 0;
     mn_send_midi_realtime(MIDI_SYNCH_STOP);
+    mn_set_left(0);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void on_continue() {
-    g_is_running = 1;
-    mn_set_left(1);
+    g_st.is_running = 1;
     mn_send_midi_realtime(MIDI_SYNCH_CONTINUE);    
+    mn_set_left(1);
 }
 ////////////////////////////////////////////////////////////////////////////////
 void app_key_event(byte event, byte keys) {
     if(event == EV_KEY_DOWN) {
         switch(keys) {
             case KEY_1: // drop a tick
-                ++g_ticks_to_drop;
+                ++g_st.ticks_to_drop;
                 break;
             case KEY_2: // add a tick
                 send_tick_out();
@@ -93,8 +73,8 @@ void app_midi_realtime(byte data) {
             on_continue();
             break;
         case MIDI_SYNCH_TICK:
-            if(g_ticks_to_drop > 0) {
-                --g_ticks_to_drop;
+            if(g_st.ticks_to_drop > 0) {
+                --g_st.ticks_to_drop;
             }
             else {
                 send_tick_out();
@@ -103,19 +83,18 @@ void app_midi_realtime(byte data) {
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-void app_midi_msg(byte status, byte num_params, byte param1, byte param2) {
-}
-////////////////////////////////////////////////////////////////////////////////
-void app_tick() {
-}
-////////////////////////////////////////////////////////////////////////////////
-void app_init() {
-    g_is_running = 1;
+void reset() {
+    g_st.is_running = 1;
+    g_st.tick_count = 0;
+    g_st.ticks_to_drop = 0;    
     mn_set_left(1);
-    g_tick_count = 0;
-    g_ticks_to_drop = 0;    
 }
+
 ////////////////////////////////////////////////////////////////////////////////
-void app_run() {   
+PUBLIC void app_init_clocksucker() {
+    g_app.app_key_event = app_key_event;
+    g_app.app_midi_realtime = app_midi_realtime;    
+    reset();
 }
+
 #endif
