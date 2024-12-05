@@ -42,3 +42,5 @@ firmware/out
 firmware/HexToSyx.exe
 case/Backup_of_midi_nubbin-case.cdr
 case/Backup_of_midi_nubbin-case.cdr
+test_firmware.X/build
+test_firmware.X/dist
