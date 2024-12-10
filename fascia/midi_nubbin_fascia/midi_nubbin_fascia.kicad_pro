@@ -262,7 +262,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "generic/",
+      "plot": "clock/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "",
