@@ -38,7 +38,7 @@ PRIVATE void inc_transpose(int delta) {
 PRIVATE void on_note(byte note, byte vel) {
     int new_note = note + g_st.transpose;
     if(new_note >= 0 && new_note < 128) {
-        mn_send_midi_msg(MIDI_STATUS_NOTE_ON|g_mn.chan, 2, (byte)new_note, vel);
+        mn_send_midi_msg(MIDI_STATUS_NOTE_ON|g_mn_cfg.chan, 2, (byte)new_note, vel);
         if(vel) {
             mn_add_note_to_array((byte)new_note);
             mn_blink_right();
@@ -68,7 +68,7 @@ PRIVATE void app_key_event(byte event, byte keys) {
                 inc_transpose(+1);
                 break;
             case KEY_5: // toggle on/off
-                g_mn.enabled = !g_mn.enabled;
+                g_mn_state.enabled = !g_mn_state.enabled;
                 mn_note_array_off();    // mute all playing notes on the channel 
                 mn_clear_note_array();                
                 break;
@@ -84,13 +84,13 @@ PRIVATE void app_key_event(byte event, byte keys) {
 }
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void app_midi_msg(byte status, byte num_params, byte param1, byte param2) {
-    if(g_mn.enabled) {
+    if(g_mn_state.enabled) {
         mn_app_std_midi_msg(status, num_params, param1, param2);
-        if(status == (MIDI_STATUS_NOTE_ON|g_mn.chan)) {            
+        if(status == (MIDI_STATUS_NOTE_ON|g_mn_cfg.chan)) {            
             on_note(param1, param2);
             return;
         }
-        if(status == (MIDI_STATUS_NOTE_OFF|g_mn.chan)) {
+        if(status == (MIDI_STATUS_NOTE_OFF|g_mn_cfg.chan)) {
             on_note(param1, 0);
             return;
         }

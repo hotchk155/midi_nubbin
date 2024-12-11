@@ -83,6 +83,7 @@ void main(void) {
     // initialise the utils
     mn_utils_reset();
     
+    
     // initialise the specific app to run
     app_init_chord_strum();
     //app_init_da_chord();

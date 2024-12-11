@@ -60,19 +60,19 @@ PRIVATE void app_key_event(byte event, byte keys) {
     if(event == EV_KEY_DOWN) {
         switch(keys) {
             case KEY_1: 
-                g_mn.scale = g_min_scale;      
+                g_mn_cfg.scale_type = MN_SCALE_MINOR;      
                 break;
             case KEY_2: 
-                g_mn.scale = g_maj_scale;                
+                g_mn_cfg.scale_type = MN_SCALE_MAJOR;                
                 break;
             case KEY_3: 
-                g_mn.apply_above_split = 0;
+                g_mn_cfg.apply_above_split = 0;
                 break;
             case KEY_4: 
-                g_mn.apply_above_split = 1;
+                g_mn_cfg.apply_above_split = 1;
                 break;
             case KEY_5: // toggle on/off
-                g_mn.enabled = !g_mn.enabled;
+                g_mn_state.enabled = !g_mn_state.enabled;
                 mn_pop_all_notes();
                 mn_note_array_off();
                 break;
@@ -82,11 +82,11 @@ PRIVATE void app_key_event(byte event, byte keys) {
         switch(keys) {        
             case KEY_1: 
             case KEY_2: 
-                g_mn.scale_root = NO_NOTE;
+                g_mn_cfg.scale_root = NO_NOTE;
                 break;
             case KEY_3: 
             case KEY_4:                
-                g_mn.split_point = NO_NOTE;
+                g_mn_cfg.split_point = NO_NOTE;
                 break;
             case KEY_5: // RESET
                 reset();
@@ -96,13 +96,13 @@ PRIVATE void app_key_event(byte event, byte keys) {
 }
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void app_midi_msg(byte status, byte num_params, byte param1, byte param2) {    
-    if(g_mn.enabled) {
+    if(g_mn_state.enabled) {
         mn_app_std_midi_msg(status, num_params, param1, param2);
-        if(status == (MIDI_STATUS_NOTE_ON|g_mn.chan) && mn_app_apply_to_note(param1)) {            
+        if(status == (MIDI_STATUS_NOTE_ON|g_mn_cfg.chan) && mn_app_apply_to_note(param1)) {            
             on_note(param1, param2);
             return;
         }
-        if(status == (MIDI_STATUS_NOTE_OFF|g_mn.chan) && mn_app_apply_to_note(param1)) {
+        if(status == (MIDI_STATUS_NOTE_OFF|g_mn_cfg.chan) && mn_app_apply_to_note(param1)) {
             on_note(param1, 0);
             return;
         }

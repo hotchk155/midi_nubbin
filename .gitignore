@@ -36,12 +36,12 @@ Desktop.ini
 
 test_firmware.X/build
 test_firmware.X/dist
-firmware/build
-firmware/dist
-firmware/.generated-cmakefiles
-firmware/_build_mplab
-firmware/out
-firmware/HexToSyx.exe
+firmware.X/build
+firmware.X/dist
+firmware.X/.generated-cmakefiles
+firmware.X/_build_mplab
+firmware.X/out
+firmware.X/HexToSyx.exe
 Backup_of_*.cdr
 fascia/midi_nubbin_fascia/midi_nubbin_fascia-backups
 ~*.*

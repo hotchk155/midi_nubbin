@@ -5,7 +5,6 @@
                    displayName="Header Files"
                    projectFiles="true">
       <itemPath>mn.h</itemPath>
-      <itemPath>mn_utils.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -16,12 +15,12 @@
                    projectFiles="true">
       <itemPath>main.c</itemPath>
       <itemPath>clocksucker.c</itemPath>
-      <itemPath>mn.c</itemPath>
       <itemPath>pitchslap.c</itemPath>
       <itemPath>tests.c</itemPath>
       <itemPath>dachord.c</itemPath>
       <itemPath>chordstrum.c</itemPath>
       <itemPath>mn_utils.c</itemPath>
+      <itemPath>mn_core.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

@@ -405,7 +405,6 @@ void mn_saf_write(byte *addr, size_t size)
     }
     memcpy(buf, addr, size);
     
-    di();
     
     // prepare the row erase
     NVMADRL = (byte)SAF_ADDR; // set up base address of the row to erase (32-word boundary)
@@ -413,33 +412,27 @@ void mn_saf_write(byte *addr, size_t size)
     NVMCON1bits.NVMREGS = 0;        // access program flash memory
     NVMCON1bits.FREE = 1;           // flag this is an erase operation
     NVMCON1bits.WREN = 1;           // enable write
+    di();
 	NVMCON2 = 0x55;                 // special unlock sequence
 	NVMCON2 = 0xAA;		    
 	NVMCON1bits.WR = 1;                 // kick off the erase
+    ei();
 
     // LOAD THE WRITE LATCHES
     // Prepare to write new data into the cleared row. The sequence is to 
     // load the 32 word write buffer (latches), then kick off the write	
-	NVMCON1bits.LWLO = 1;           // indicate we're setting up the latches
 	for(int i=0; i<64; i+=2) 
 	{
-		NVMDATL = buf[i+1]; // set up the word to load into the next word latch
+        NVMCON1bits.LWLO = (i<62);       // indicate if we're setting up the latches
+		NVMDATL = buf[i+1];         // set up the word to load into the next word latch
 		NVMDATH = buf[i];
+        di();
 		NVMCON2 = 0x55;             // special unlock sequence
 		NVMCON2 = 0xAA;		
 		NVMCON1bits.WR = 1;         // perform the write to the latches. execution halts till complete
+        ei();
 		++NVMADRL;                  // and on to the next address...
 	}
-
-	// PERFORM THE WRITE TO FLASH
-	NVMCON1bits.LWLO = 0;           // ready to write from latches to FLASH
-    NVMADRL = (byte)SAF_ADDR;        // set the row address
-    NVMADRH = (byte)(SAF_ADDR >> 8);
-	NVMDATL = buf[1];
-	NVMDATH = buf[0];
-	NVMCON2 = 0x55;                 // special unlock sequence
-	NVMCON2 = 0xAA;		
-	NVMCON1bits.WR = 1;             // start write
 	
 	NVMCON1bits.WREN = 0;	// disable writes
     

@@ -3,7 +3,8 @@
 #include "mn.h"
 #include "mn_utils.h"
 
-MN_STD_STATE g_mn;
+MN_CFG g_mn_cfg;
+MN_STATE g_mn_state;
 
 // general purpose array of 128 bytes 
 PRIVATE byte g_note_array[128];
@@ -43,6 +44,15 @@ const byte g_min_scale[12] = {
     CHORD_MAJ, //G#         
 };
 
+////////////////////////////////////////////////////////////////////////////////
+inline const byte *mn_scale(byte type) {
+    switch(type) {
+        case MN_SCALE_MINOR:
+            return g_min_scale;
+        default: //case MN_SCALE_MAJOR:
+            return g_maj_scale;
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 void mn_clear_note_array() {
@@ -57,14 +67,14 @@ void mn_add_note_to_array(byte note) {
 ////////////////////////////////////////////////////////////////////////////////
 void mn_note_array_note_on(byte index, byte vel) {
     if(index<128 && (g_note_array[index] & NOTE_IS_VALID)) {
-        mn_send_midi_msg(MIDI_STATUS_NOTE_ON|g_mn.chan, 2, index, vel);    
+        mn_send_midi_msg(MIDI_STATUS_NOTE_ON|g_mn_cfg.chan, 2, index, vel);    
         g_note_array[index] |= NOTE_IS_PLAYING;
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
 void mn_note_array_note_off(byte index) {
     if(index<128 && (g_note_array[index] & NOTE_IS_VALID)) {
-        mn_send_midi_msg(MIDI_STATUS_NOTE_ON|g_mn.chan, 2, index, 0);    
+        mn_send_midi_msg(MIDI_STATUS_NOTE_ON|g_mn_cfg.chan, 2, index, 0);    
         g_note_array[index] &= ~NOTE_IS_PLAYING;
     }
 }
@@ -82,7 +92,7 @@ void mn_note_array_off() {
 }
 ////////////////////////////////////////////////////////////////////////////////
 void mn_note_array_track_note_msg(byte status, byte num_params, byte note, byte vel) {
-    if(status == (MIDI_STATUS_NOTE_ON|g_mn.chan)) {
+    if(status == (MIDI_STATUS_NOTE_ON|g_mn_cfg.chan)) {
         if(vel) {
             g_note_array[note] |= (NOTE_IS_VALID|NOTE_IS_PLAYING);        
         }
@@ -90,7 +100,7 @@ void mn_note_array_track_note_msg(byte status, byte num_params, byte note, byte 
             g_note_array[note] &= ~(NOTE_IS_VALID|NOTE_IS_PLAYING);                    
         }
     }
-    else if(status == (MIDI_STATUS_NOTE_OFF|g_mn.chan)) {
+    else if(status == (MIDI_STATUS_NOTE_OFF|g_mn_cfg.chan)) {
         g_note_array[note] &= ~(NOTE_IS_VALID|NOTE_IS_PLAYING);                            
     }
 }
@@ -154,8 +164,9 @@ PRIVATE void chord_note(byte **dest, byte note) {
 }
 ////////////////////////////////////////////////////////////////////////////////
 void mn_build_triad(byte root, byte *dest) {    
-    byte note_in_scale = (byte)(12 + root - g_mn.scale_root)%12;    
-    switch(g_mn.scale[note_in_scale]) {
+    byte note_in_scale = (byte)(12 + root - g_mn_cfg.scale_root)%12;    
+    const byte *scale = mn_scale(g_mn_cfg.scale_type);
+    switch(scale[note_in_scale]) {
         case CHORD_MAJ:
             chord_note(&dest,root);
             chord_note(&dest,root+4);
@@ -182,20 +193,20 @@ void mn_build_triad(byte root, byte *dest) {
 void mn_utils_reset() {
     mn_pop_all_notes();
     mn_clear_note_array();
-    g_mn.scale = g_maj_scale;
-    g_mn.scale_root = NOTE_C;
-    g_mn.chan = NO_CHAN;
-    g_mn.enabled = 1;
-    g_mn.split_point = 0;
-    g_mn.apply_above_split = 1;
+    g_mn_cfg.scale_type = MN_SCALE_MAJOR;
+    g_mn_cfg.scale_root = NOTE_C;
+    g_mn_cfg.chan = NO_CHAN;
+    g_mn_state.enabled = 1;
+    g_mn_cfg.split_point = 0;
+    g_mn_cfg.apply_above_split = 1;
 }
 ////////////////////////////////////////////////////////////////////////////////
 void mn_app_std_leds() {
     static byte ticker;
-    if(!g_mn.enabled) {
+    if(!g_mn_state.enabled) {
         P_LED1 = 0;
     }
-    else if(g_mn.chan == NO_CHAN || g_mn.scale_root == NO_NOTE || g_mn.split_point == NO_NOTE) {
+    else if(g_mn_cfg.chan == NO_CHAN || g_mn_cfg.scale_root == NO_NOTE || g_mn_cfg.split_point == NO_NOTE) {
         P_LED1 = !(ticker & 0x40);
         ++ticker;
     }
@@ -207,26 +218,29 @@ void mn_app_std_leds() {
 void mn_app_std_midi_msg(byte status, byte num_params, byte param1, byte param2) {
     if(((status & 0xF0) == MIDI_STATUS_NOTE_ON) && param2) {       
         byte chan = status & 0x0F;
-        if(g_mn.chan == NO_CHAN) {
-            g_mn.chan = chan;
+        if(g_mn_cfg.chan == NO_CHAN) {
+            g_mn_cfg.chan = chan;
+            mn_save_settings();
         }
-        if(g_mn.scale_root == NO_NOTE && chan == g_mn.chan) {
-            g_mn.scale_root = param1;
+        if(g_mn_cfg.scale_root == NO_NOTE && chan == g_mn_cfg.chan) {
+            g_mn_cfg.scale_root = param1;
+            mn_save_settings();
         }
-        if(g_mn.split_point == NO_NOTE && chan == g_mn.chan) {
-            g_mn.split_point = param1;
+        if(g_mn_cfg.split_point == NO_NOTE && chan == g_mn_cfg.chan) {
+            g_mn_cfg.split_point = param1;
+            mn_save_settings();
         }
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
 byte mn_app_apply_to_note(byte note) {
-    if(g_mn.split_point == NO_NOTE) {
+    if(g_mn_cfg.split_point == NO_NOTE) {
         return 1;
     }
-    else if(g_mn.apply_above_split) {
-        return (g_mn.split_point <= note);
+    else if(g_mn_cfg.apply_above_split) {
+        return (g_mn_cfg.split_point <= note);
     }
     else {
-        return (g_mn.split_point > note);        
+        return (g_mn_cfg.split_point > note);        
     }
 }
