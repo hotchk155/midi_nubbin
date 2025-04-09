@@ -13,43 +13,45 @@
 #if 1
 #include <xc.h>
 #include "mn.h"
-#include "mn_utils.h"
 
 const int MAX_TRANSPOSE = 36;
 const int MIN_TRANSPOSE = -36;
 
-typedef struct {
-    int transpose;
-} APP_STATE;
-PRIVATE APP_STATE g_st;
-
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void inc_transpose(int delta) {
-    mn_note_array_off();    
-    g_st.transpose += delta;
-    if(g_st.transpose < MIN_TRANSPOSE) {
-        g_st.transpose  = MIN_TRANSPOSE;
+    mn_chord_play(0);    
+    int transpose = g_mn_cfg.transpose + delta;
+    if(transpose < MIN_TRANSPOSE) {
+        transpose  = MIN_TRANSPOSE;
     }
-    if(g_st.transpose > MAX_TRANSPOSE) {
-        g_st.transpose  = MAX_TRANSPOSE;
-    }    
+    if(transpose > MAX_TRANSPOSE) {
+        transpose  = MAX_TRANSPOSE;
+    }
+    g_mn_cfg.transpose = (char)transpose;
 }
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void on_note(byte note, byte vel) {
-    int new_note = note + g_st.transpose;
-    if(new_note >= 0 && new_note < 128) {
-        mn_send_midi_msg(MIDI_STATUS_NOTE_ON|g_mn_cfg.chan, 2, (byte)new_note, vel);
-        if(vel) {
-            mn_add_note_to_array((byte)new_note);
-            mn_blink_right();
+    if(g_mn_state.enabled) {
+        int new_note = note + g_mn_cfg.transpose;
+        if(new_note >= 0 && new_note < 128) {
+            mn_chord_note((byte)new_note, vel);
+            if(vel) {
+                mn_blink_right();
+            }
         }
+    }
+    else {
+        // pass through the note message unchanged, but 
+        // remember it in the chord so it can be stopped 
+        // when the effect is engaged
+        mn_chord_note(note, vel);
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void reset() {
-    mn_note_array_off();
+    mn_chord_play(0);
     mn_utils_reset();
-    g_st.transpose = 0;
+    g_mn_cfg.transpose = 0;
 }
 ////////////////////////////////////////////////////////////////////////////////
 PRIVATE void app_key_event(byte event, byte keys) {
@@ -69,8 +71,8 @@ PRIVATE void app_key_event(byte event, byte keys) {
                 break;
             case KEY_5: // toggle on/off
                 g_mn_state.enabled = !g_mn_state.enabled;
-                mn_note_array_off();    // mute all playing notes on the channel 
-                mn_clear_note_array();                
+                mn_chord_play(0);    // mute all playing notes on the channel 
+                mn_chord_init();                
                 break;
         }
     }
@@ -83,22 +85,17 @@ PRIVATE void app_key_event(byte event, byte keys) {
     }
 }
 ////////////////////////////////////////////////////////////////////////////////
-PRIVATE void app_midi_msg(byte status, byte num_params, byte param1, byte param2) {
-    if(g_mn_state.enabled) {
-        mn_app_std_midi_msg(status, num_params, param1, param2);
-        if(status == (MIDI_STATUS_NOTE_ON|g_mn_cfg.chan)) {            
-            on_note(param1, param2);
-            return;
-        }
-        if(status == (MIDI_STATUS_NOTE_OFF|g_mn_cfg.chan)) {
-            on_note(param1, 0);
-            return;
-        }
-    }
-    else {
-        // track note messages on the selected channel so that ON notes can be 
-        // muted when the effect is turned on
-        mn_note_array_track_note_msg(status, num_params, param1, param2);
+PRIVATE void app_midi_msg(byte status, byte num_params, byte param1, byte param2) {    
+    mn_std_handle_msg(status, num_params, param1, param2);    
+    if((status & 0x0F) == g_mn_cfg.chan) {        
+        switch(status & 0xF0) {
+            case MIDI_STATUS_NOTE_ON:
+                on_note(param1, param2);
+                return;
+            case MIDI_STATUS_NOTE_OFF:
+                on_note(param1, 0);
+                return;
+        }       
     }
     mn_send_midi_msg(status, num_params, param1, param2);    
 }
@@ -106,7 +103,7 @@ PRIVATE void app_midi_msg(byte status, byte num_params, byte param1, byte param2
 PUBLIC void app_init_pitchslap() {
     g_app.app_key_event = app_key_event;
     g_app.app_midi_msg = app_midi_msg;    
-    g_app.app_tick = mn_app_std_leds;
+    g_app.app_tick = mn_std_status_leds;
     reset();
 }
 

@@ -2,11 +2,10 @@
 // MIDI NUBBIN : DA CHORD
 // Chord maker with strumming via the pitch bend wheel
 
-#if 1
+#if 0
 #include <xc.h>
 #include <string.h>
 #include "mn.h"
-#include "mn_utils.h"
 
 typedef struct {
     byte chord_vel;
@@ -60,19 +59,24 @@ PRIVATE void app_key_event(byte event, byte keys) {
     if(event == EV_KEY_DOWN) {
         switch(keys) {
             case KEY_1: 
-                g_mn_cfg.scale_type = MN_SCALE_MINOR;      
+                mn_set_scale_type(MN_SCALE_MINOR);
+                //g_mn_cfg.scale_type = MN_SCALE_MINOR;      
                 break;
             case KEY_2: 
-                g_mn_cfg.scale_type = MN_SCALE_MAJOR;                
+                mn_set_scale_type(MN_SCALE_MAJOR);
+                //g_mn_cfg.scale_type = MN_SCALE_MAJOR;                
                 break;
             case KEY_3: 
-                g_mn_cfg.apply_above_split = 0;
+                mn_set_apply_above_split(0);
+                //g_mn_cfg.apply_above_split = 0;
                 break;
             case KEY_4: 
+                mn_set_apply_above_split(1);
                 g_mn_cfg.apply_above_split = 1;
                 break;
             case KEY_5: // toggle on/off
-                g_mn_state.enabled = !g_mn_state.enabled;
+                mn_toggle_enabled();                
+                //g_mn_state.enabled = !g_mn_state.enabled;
                 mn_pop_all_notes();
                 mn_note_array_off();
                 break;
@@ -82,11 +86,13 @@ PRIVATE void app_key_event(byte event, byte keys) {
         switch(keys) {        
             case KEY_1: 
             case KEY_2: 
-                g_mn_cfg.scale_root = NO_NOTE;
+                mn_reset_scale_root();
+                //g_mn_cfg.scale_root = NO_NOTE;
                 break;
             case KEY_3: 
             case KEY_4:                
-                g_mn_cfg.split_point = NO_NOTE;
+                mn_reset_split_point();
+                //g_mn_cfg.split_point = NO_NOTE;
                 break;
             case KEY_5: // RESET
                 reset();

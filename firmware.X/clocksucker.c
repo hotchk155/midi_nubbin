@@ -1,6 +1,6 @@
 #include <xc.h>
 #include "mn.h"
-#if 1
+#if 0
 typedef struct {
     byte is_running;    
     byte tick_count;

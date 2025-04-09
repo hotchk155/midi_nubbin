@@ -1,11 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 // MIDI NUBBIN : CHORD STRUM
 
-#if 1
+#if 0
 #include <xc.h>
 #include <string.h>
 #include "mn.h"
-#include "mn_utils.h"
 
 enum {
     STRUM_NONE,

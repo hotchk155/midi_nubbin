@@ -4,6 +4,25 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+/*
+ 
+       PIC16F15345
+ 
+        VDD | VSS
+LED1    RA5 | RA0
+KEY1    RA4 | RA1
+        RA3 | RA2
+RX      RC5 | RC0       LED2
+TX      RC4 | RC1
+KEY2    RC3 | RC2 
+KEY3    RC6 | RB4
+KEY4    RC7 | RB5   
+KEY5    RB7 | RB6
+ 
+ */
+// COMPILER SETTINGS
+// Memory Model
+//      - ROM Ranges: default,-1F80-1FFF
 
 // PIC16F15345 Configuration Bit Settings
 // 'C' source line config statements
@@ -48,7 +67,6 @@
 
 #include <xc.h>
 #include "mn.h"
-#include "mn_utils.h"
 
 MNApp g_app;
 PRIVATE void app_key_event(byte event, byte keys){    
@@ -85,7 +103,7 @@ void main(void) {
     
     
     // initialise the specific app to run
-    app_init_chord_strum();
+    app_init_pitchslap();
     //app_init_da_chord();
     for(;;) {
         // run the application
